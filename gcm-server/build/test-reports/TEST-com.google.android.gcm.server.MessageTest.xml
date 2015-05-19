@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="HP" name="com.google.android.gcm.server.MessageTest" skipped="0" tests="3" time="0.092" timestamp="2015-05-19T22:09:16">
+  <properties>
+    <property name="java.vendor" value="Oracle Corporation" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="eclipse.pdebuild.templates" value="/C:/eclipseLunaJEE/plugins/org.eclipse.pde.build_3.9.0.v20140415-2029/templates/" />
+    <property name="sun.management.compiler" value="HotSpot Client Compiler" />
+    <property name="dist" value="C:\Users\Usuario\git_repo\gcm-server\dist" />
+    <property name="lib" value="C:\Users\Usuario\git_repo\gcm-server\lib" />
+    <property name="src-jar" value="C:\Users\Usuario\git_repo\gcm-server\dist/gcm-server-src.jar" />
+    <property name="os.name" value="Windows 8.1" />
+    <property name="sun.boot.class.path" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\resources.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\rt.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\sunrsasign.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\jsse.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\jce.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\charsets.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\jfr.jar;C:\Program Files (x86)\Java\jdk1.8.0_45\jre\classes" />
+    <property name="test-classes" value="C:\Users\Usuario\git_repo\gcm-server\build\test-classes" />
+    <property name="sun.desktop" value="windows" />
+    <property name="java.vm.specification.vendor" value="Oracle Corporation" />
+    <property name="ant.home" value="C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502" />
+    <property name="demo-dir" value="C:\Users\Usuario\git_repo\gcm-server/../samples/gcm-demo-server" />
+    <property name="java.runtime.version" value="1.8.0_45-b15" />
+    <property name="user.name" value="Usuario" />
+    <property name="user.language" value="es" />
+    <property name="build" value="C:\Users\Usuario\git_repo\gcm-server\build" />
+    <property name="sun.boot.library.path" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre\bin" />
+    <property name="ant.project.default-target" value="dist" />
+    <property name="ant.project.name" value="gcm-server" />
+    <property name="java.version" value="1.8.0_45" />
+    <property name="classes" value="C:\Users\Usuario\git_repo\gcm-server\build\classes" />
+    <property name="version" value="dev" />
+    <property name="user.timezone" value="Europe/Paris" />
+    <property name="ant.file.type.gcm-server" value="file" />
+    <property name="sun.arch.data.model" value="32" />
+    <property name="java.endorsed.dirs" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\endorsed" />
+    <property name="jar" value="C:\Users\Usuario\git_repo\gcm-server\dist/gcm-server.jar" />
+    <property name="sun.cpu.isalist" value="pentium_pro+mmx pentium_pro pentium+mmx pentium i486 i386 i86" />
+    <property name="sun.jnu.encoding" value="Cp1252" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="file.separator" value="\" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="java.class.version" value="52.0" />
+    <property name="src" value="C:\Users\Usuario\git_repo\gcm-server\src" />
+    <property name="ant.file.gcm-server" value="C:\Users\Usuario\git_repo\gcm-server\build.xml" />
+    <property name="user.country" value="ES" />
+    <property name="java.home" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="ant.file" value="C:\Users\Usuario\git_repo\gcm-server\build.xml" />
+    <property name="os.version" value="6.3" />
+    <property name="path.separator" value=";" />
+    <property name="java.vm.version" value="25.45-b02" />
+    <property name="user.variant" value="" />
+    <property name="ant.library.dir" value="C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib" />
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
+    <property name="user.script" value="" />
+    <property name="eclipse.pdebuild.scripts" value="/C:/eclipseLunaJEE/plugins/org.eclipse.pde.build_3.9.0.v20140415-2029/scripts/" />
+    <property name="user.home" value="C:\Users\Usuario" />
+    <property name="java.specification.vendor" value="Oracle Corporation" />
+    <property name="test" value="C:\Users\Usuario\git_repo\gcm-server\test" />
+    <property name="java.library.path" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Program Files (x86)/Java/jre1.8.0_45/bin/client;C:/Program Files (x86)/Java/jre1.8.0_45/bin;C:/Program Files (x86)/Java/jre1.8.0_45/lib/i386;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\HP SimplePass\;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files (x86)\Intel\OpenCL SDK\3.0\bin\x86;C:\Program Files (x86)\Intel\OpenCL SDK\3.0\bin\x64;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Users\Usuario\Android\sdk\platform-tools;C:\Program Files (x86)\nodejs\;C:\Program Files (x86)\Git\cmd;C:\Users\Usuario\npm_mod_global;C:\eclipseLunaJEE;;." />
+    <property name="java.vendor.url" value="http://java.oracle.com/" />
+    <property name="java.vm.vendor" value="Oracle Corporation" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner com.google.android.gcm.server.MessageTest filtertrace=true haltOnError=false haltOnFailure=true formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true logtestlistenerevents=false formatter=org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter,C:\Users\Usuario\git_repo\gcm-server\build\test-reports\TEST-com.google.android.gcm.server.MessageTest.txt formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\Users\Usuario\git_repo\gcm-server\build\test-reports\TEST-com.google.android.gcm.server.MessageTest.xml crashfile=C:\Users\Usuario\git_repo\gcm-server\junitvmwatcher486762447098463157.properties propsfile=C:\Users\Usuario\git_repo\gcm-server\junit8529370266390693670.properties" />
+    <property name="java.class.path" value="C:\Users\Usuario\git_repo\gcm-server\lib\json_simple-1.1.jar;C:\Users\Usuario\git_repo\gcm-server\lib\junit.jar;C:\Users\Usuario\git_repo\gcm-server\lib\mockito-all-1.8.5.jar;C:\Users\Usuario\git_repo\gcm-server\build\classes;C:\Users\Usuario\git_repo\gcm-server\build\test-classes;C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib\ant-launcher.jar;C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib\ant.jar;C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib\ant-junit.jar;C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib\ant-junit4.jar" />
+    <property name="ant.version" value="Apache Ant(TM) version 1.9.2 compiled on July 8 2013" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="java.vm.specification.version" value="1.8" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="sun.os.patch.level" value="" />
+    <property name="eclipse.pdebuild.home" value="/C:/eclipseLunaJEE/plugins/org.eclipse.pde.build_3.9.0.v20140415-2029/./" />
+    <property name="java.io.tmpdir" value="C:\Users\Usuario\AppData\Local\Temp\" />
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/" />
+    <property name="os.arch" value="x86" />
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment" />
+    <property name="java.ext.dirs" value="C:\Program Files (x86)\Java\jdk1.8.0_45\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext" />
+    <property name="user.dir" value="C:\Users\Usuario\git_repo\gcm-server" />
+    <property name="line.separator" value="&#xd;&#xa;" />
+    <property name="java.vm.name" value="Java HotSpot(TM) Client VM" />
+    <property name="basedir" value="C:\Users\Usuario\git_repo\gcm-server" />
+    <property name="ant.java.version" value="1.8" />
+    <property name="ant.core.lib" value="C:\eclipseLunaJEE\plugins\org.apache.ant_1.9.2.v201404171502\lib\ant.jar" />
+    <property name="file.encoding" value="Cp1252" />
+    <property name="java.specification.version" value="1.8" />
+    <property name="ant.project.invoked-targets" value="dist" />
+    <property name="test-reports" value="C:\Users\Usuario\git_repo\gcm-server\build\test-reports" />
+    <property name="demo-appengine-dir" value="C:\Users\Usuario\git_repo\gcm-server/../samples/gcm-demo-appengine" />
+  </properties>
+  <testcase classname="com.google.android.gcm.server.MessageTest" name="testOptionalParameters" time="0.007" />
+  <testcase classname="com.google.android.gcm.server.MessageTest" name="testRequiredParameters" time="0.0" />
+  <testcase classname="com.google.android.gcm.server.MessageTest" name="testPayloadDataIsImmutable" time="0.0" />
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

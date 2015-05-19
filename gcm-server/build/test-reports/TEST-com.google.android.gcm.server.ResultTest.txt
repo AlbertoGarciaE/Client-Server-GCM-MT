@@ -1,0 +1,5 @@
+Testsuite: com.google.android.gcm.server.ResultTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0,111 sec
+
+Testcase: testOptionalParameters took 0,004 sec
+Testcase: testRequiredParameters took 0 sec

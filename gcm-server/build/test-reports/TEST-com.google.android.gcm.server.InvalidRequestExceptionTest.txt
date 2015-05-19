@@ -1,0 +1,5 @@
+Testsuite: com.google.android.gcm.server.InvalidRequestExceptionTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0,058 sec
+
+Testcase: testGetters_noDescription took 0,003 sec
+Testcase: testGetters_description took 0 sec

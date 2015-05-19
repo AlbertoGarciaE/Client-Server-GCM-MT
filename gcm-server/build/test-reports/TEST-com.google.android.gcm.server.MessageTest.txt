@@ -1,0 +1,6 @@
+Testsuite: com.google.android.gcm.server.MessageTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0,092 sec
+
+Testcase: testOptionalParameters took 0,005 sec
+Testcase: testRequiredParameters took 0 sec
+Testcase: testPayloadDataIsImmutable took 0 sec

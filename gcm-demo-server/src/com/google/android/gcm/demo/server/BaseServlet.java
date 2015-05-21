@@ -51,7 +51,6 @@ abstract class BaseServlet extends HttpServlet {
     if (isEmptyOrNull(value)) {
       if (DEBUG) {
         StringBuilder parameters = new StringBuilder();
-        @SuppressWarnings("unchecked")
         Enumeration<String> names = req.getParameterNames();
         while (names.hasMoreElements()) {
           String name = names.nextElement();

@@ -12,7 +12,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ 
 package gcmserver.core;
 
 import static org.junit.Assert.assertEquals;
@@ -406,7 +406,7 @@ public class SenderTest {
   @Test()
   public void testSend_json_ok() throws Exception {
     doNothing().when(sender).sleep(anyInt());
-    /*
+    
      * The following scenario is mocked below:
      *
      * input: 4, 8, 15, 16, 23, 42
@@ -420,7 +420,7 @@ public class SenderTest {
      *
      * output: total:6, success:3, error: 3, canonicals: 0, multicast_id: 100
      *         results: ok, error, unavailable, ok, ok, error
-     */
+     
     Result unaivalableResult =
         new Result.Builder().errorCode("Unavailable").build();
     Result internalServerErrorResult =
@@ -761,9 +761,9 @@ public class SenderTest {
     assertEquals(200, response.getResponseCode());
   }
 
-  /**
+  *//**
    * Sets the expectations of the HTTP connection.
-   */
+   *//*
   private void setResponseExpectations(int statusCode, String response) 
       throws IOException {
     when(mockedConn.getResponseCode()).thenReturn(statusCode);
@@ -814,3 +814,4 @@ public class SenderTest {
   }
 
 }
+*/

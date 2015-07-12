@@ -5,7 +5,6 @@ import gcmserver.core.Message;
 import gcmserver.core.MulticastResult;
 import gcmserver.core.Result;
 import gcmserver.core.Sender;
-import gcmserver.serverlets.ApiKeyInitializer;
 import gcmserver.serverlets.Datastore;
 
 import java.io.IOException;
@@ -14,56 +13,97 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 
-import org.hibernate.validator.internal.util.logging.Log_.logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/Notification")
 public class NotificationController {
 
+	protected final Logger logger = Logger.getLogger(getClass().getName());
+
 	private static final int MULTICAST_SIZE = 1000;
-	// TODO pass API key to sender
-	private final Sender sender;
+
+	private Sender sender;
+	private Message message;
 
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
-	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.GET)
-	protected void notificationHttpPlain(@RequestParam String regId,
-			HttpSession sesion, Model modelo) throws IOException {
+	@Value("${gcm.attributeAccesKey}")
+	private String attribute_acces_key;
+
+	@PostConstruct
+	public void init() {
+
+		sender = new Sender(attribute_acces_key);
+		message = new Message();
+	}
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ModelAndView home(Model modelo) {
+		modelo.addAttribute("message", message);
+		return new ModelAndView("Notifications", "modelo", modelo);
+	}
+
+	/**
+	 * Send a message to a single target device via HTTP using plain text
+	 * 
+	 * @param regId
+	 * @param message
+	 * @param sesion
+	 * @param modelo
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.POST)
+	protected ModelAndView notificationHttpPlain(
+			@ModelAttribute Message message, HttpSession sesion, Model modelo)
+			throws IOException {
 		/*
 		 * TODO Send http plain text notification
 		 */
 
-		String registrationId = regId;
+		String registrationId = message.getTarget();
 		String status;
+		Result result = null;
 		if (registrationId.isEmpty()) {
 			status = "Message ignored as there is no target device id!";
 		} else {
-			// NOTE: check below is for demonstration purposes; a real
-			// application
-			// could always send a multicast, even for just one recipient
-
 			// send a single message using plain post
-			Message message = new Message.Builder().build();
-			Result result = this.sender.send(message, registrationId, 5);
+			result = this.sender.send(message, registrationId, 5);
 			status = "Sent message to one device: " + result;
 		}
 
 		// Logging the status to system log y web log
-		System.out.print(status);
+		logger.fine(status);
+
+		modelo.addAttribute("message", message);
+		modelo.addAttribute("response", result.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
+	/**
+	 * Send a message to a single target, a notification group or a multiple
+	 * targets via HTTP using JSON
+	 * 
+	 * @param targets
+	 * @param message
+	 * @param sesion
+	 * @param modelo
+	 */
 	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.GET)
 	protected void notificationHttpJson(@RequestParam List<String> targets,
-			HttpSession sesion, Model modelo) {
+			@ModelAttribute Message message, HttpSession sesion, Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
@@ -76,9 +116,9 @@ public class NotificationController {
 			// NOTE: a real application
 			// could always send a multicast, even for just one recipient.
 			// Thus if we want to send a single message we pass one device only
-
-			// sending a multicast message using JSON
+			// If we are sending a multicast message using JSON
 			// we must split in chunks of 1000 devices due to GCM limit
+
 			int total = devices.size();
 			List<String> partialDevices = new ArrayList<String>(total);
 			int counter = 0;
@@ -88,24 +128,15 @@ public class NotificationController {
 				partialDevices.add(device);
 				int partialSize = partialDevices.size();
 				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialDevices);
+					asyncSend(partialDevices, message);
 					partialDevices.clear();
 					tasks++;
-
 				}
-
 			}
-			if (counter == 1) {
-				//TODO add result of the notification
-				status = "Sent message to one device: " ;
-			} else {
-				status = "Asynchronously sending " + tasks
-						+ " multicast messages to " + total + " devices";
-			}
-
+			status = "Asynchronously sending " + tasks
+					+ " multicast messages to " + total + " devices";
 		}
-		// Logging the status to system log y web log
-		System.out.print(status);
+		logger.fine(status);
 	}
 
 	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.GET)
@@ -117,20 +148,19 @@ public class NotificationController {
 	}
 
 	/**
-	 * Creates the {@link Sender} based on the servlet settings.
+	 * Send asynchronously the message to the partial list of devices
+	 * 
+	 * @param partialDevices
+	 * @param message
 	 */
-	protected Sender newSender(ServletConfig config) {
-		String key = "HOLA";
-		return new Sender(key);
-	}
-
-	private void asyncSend(List<String> partialDevices) {
+	private void asyncSend(List<String> partialDevices, Message message) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialDevices);
+
 		threadPool.execute(new Runnable() {
 
 			public void run() {
-				Message message = new Message.Builder().build();
+
 				MulticastResult multicastResult;
 				try {
 					multicastResult = sender.send(message, devices, 5);

@@ -16,207 +16,247 @@
 package gcmserver.core;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * GCM message.
  *
- * <p>
- * Instances of this class are immutable and should be created using a
- * {@link Builder}. Examples:
- *
- * <strong>Simplest message:</strong>
- * <pre><code>
- * Message message = new Message.Builder().build();
- * </pre></code>
- *
- * <strong>Message with optional attributes:</strong>
- * <pre><code>
- * Message message = new Message.Builder()
- *    .collapseKey(collapseKey)
- *    .timeToLive(3)
- *    .delayWhileIdle(true)
- *    .dryRun(true)
- *    .restrictedPackageName(restrictedPackageName)
- *    .build();
- * </pre></code>
- *
- * <strong>Message with optional attributes and payload data:</strong>
- * <pre><code>
- * Message message = new Message.Builder()
- *    .collapseKey(collapseKey)
- *    .timeToLive(3)
- *    .delayWhileIdle(true)
- *    .dryRun(true)
- *    .restrictedPackageName(restrictedPackageName)
- *    .addData("key1", "value1")
- *    .addData("key2", "value2")
- *    .build();
- * </pre></code>
  */
 public final class Message implements Serializable {
+	private String target;
+	// optional parameters
+	private String collapseKey;
+	private Integer priority;
+	private Boolean contentAvailable;
+	private Boolean delayWhileIdle;
+	private Integer timeToLive;
+	private Boolean deliveryReceiptRquested;
+	private String restrictedPackageName;
+	private Boolean dryRun;
 
-  private final String collapseKey;
-  private final Boolean delayWhileIdle;
-  private final Integer timeToLive;
-  private final Map<String, String> data;
-  private final Boolean dryRun;
-  private final String restrictedPackageName;
+	private final Map<String, String> data;
+	private final Map<String, String> notification;
 
-  public static final class Builder {
+	public Message() {
+		this.data = new LinkedHashMap<String, String>();
+		this.notification = new LinkedHashMap<String, String>();
+	}
 
-    private final Map<String, String> data;
+	/**
+	 * @return the target
+	 */
+	public String getTarget() {
+		return target;
+	}
 
-    // optional parameters
-    private String collapseKey;
-    private Boolean delayWhileIdle;
-    private Integer timeToLive;
-    private Boolean dryRun;
-    private String restrictedPackageName;
+	/**
+	 * @param target the target to set
+	 */
+	public void setTarget(String target) {
+		this.target = target;
+	}
 
-    public Builder() {
-      this.data = new LinkedHashMap<String, String>();
-    }
+	/**
+	 * @return the collapseKey
+	 */
+	public String getCollapseKey() {
+		return collapseKey;
+	}
 
-    /**
-     * Sets the collapseKey property.
-     */
-    public Builder collapseKey(String value) {
-      collapseKey = value;
-      return this;
-    }
+	/**
+	 * @param collapseKey
+	 *            the collapseKey to set
+	 */
+	public void setCollapseKey(String collapseKey) {
+		this.collapseKey = collapseKey;
+	}
 
-    /**
-     * Sets the delayWhileIdle property (default value is {@literal false}).
-     */
-    public Builder delayWhileIdle(boolean value) {
-      delayWhileIdle = value;
-      return this;
-    }
+	/**
+	 * @return the priority
+	 */
+	public Integer getPriority() {
+		return priority;
+	}
 
-    /**
-     * Sets the time to live, in seconds.
-     */
-    public Builder timeToLive(int value) {
-      timeToLive = value;
-      return this;
-    }
+	/**
+	 * @param priority
+	 *            the priority to set
+	 */
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
 
-    /**
-     * Adds a key/value pair to the payload data.
-     */
-    public Builder addData(String key, String value) {
-      data.put(key, value);
-      return this;
-    }
+	/**
+	 * @return the contentAvailable
+	 */
+	public Boolean getContentAvailable() {
+		return contentAvailable;
+	}
 
-    /**
-     * Sets the dryRun property (default value is {@literal false}).
-     */
-    public Builder dryRun(boolean value) {
-      dryRun = value;
-      return this;
-    }
+	/**
+	 * @param contentAvailable
+	 *            the contentAvailable to set
+	 */
+	public void setContentAvailable(Boolean contentAvailable) {
+		this.contentAvailable = contentAvailable;
+	}
 
-    /**
-     * Sets the restrictedPackageName property.
-     */
-    public Builder restrictedPackageName(String value) {
-      restrictedPackageName = value;
-      return this;
-    }
+	/**
+	 * @return the delayWhileIdle
+	 */
+	public Boolean getDelayWhileIdle() {
+		return delayWhileIdle;
+	}
 
-    public Message build() {
-      return new Message(this);
-    }
+	/**
+	 * @param delayWhileIdle
+	 *            the delayWhileIdle to set
+	 */
+	public void setDelayWhileIdle(Boolean delayWhileIdle) {
+		this.delayWhileIdle = delayWhileIdle;
+	}
 
-  }
+	/**
+	 * @return the timeToLive
+	 */
+	public Integer getTimeToLive() {
+		return timeToLive;
+	}
 
-  private Message(Builder builder) {
-    collapseKey = builder.collapseKey;
-    delayWhileIdle = builder.delayWhileIdle;
-    data = Collections.unmodifiableMap(builder.data);
-    timeToLive = builder.timeToLive;
-    dryRun = builder.dryRun;
-    restrictedPackageName = builder.restrictedPackageName;
-  }
+	/**
+	 * @param timeToLive
+	 *            the timeToLive to set
+	 */
+	public void setTimeToLive(Integer timeToLive) {
+		this.timeToLive = timeToLive;
+	}
 
-  /**
-   * Gets the collapse key.
-   */
-  public String getCollapseKey() {
-    return collapseKey;
-  }
+	/**
+	 * @return the deliveryReceiptRquested
+	 */
+	public Boolean getDeliveryReceiptRquested() {
+		return deliveryReceiptRquested;
+	}
 
-  /**
-   * Gets the delayWhileIdle flag.
-   */
-  public Boolean isDelayWhileIdle() {
-    return delayWhileIdle;
-  }
+	/**
+	 * @param deliveryReceiptRquested
+	 *            the deliveryReceiptRquested to set
+	 */
+	public void setDeliveryReceiptRquested(Boolean deliveryReceiptRquested) {
+		this.deliveryReceiptRquested = deliveryReceiptRquested;
+	}
 
-  /**
-   * Gets the time to live (in seconds).
-   */
-  public Integer getTimeToLive() {
-    return timeToLive;
-  }
+	/**
+	 * @return the restrictedPackageName
+	 */
+	public String getRestrictedPackageName() {
+		return restrictedPackageName;
+	}
 
-  /**
-   * Gets the dryRun flag.
-   */
-  public Boolean isDryRun() {
-    return dryRun;
-  }
+	/**
+	 * @param restrictedPackageName
+	 *            the restrictedPackageName to set
+	 */
+	public void setRestrictedPackageName(String restrictedPackageName) {
+		this.restrictedPackageName = restrictedPackageName;
+	}
 
-  /**
-   * Gets the restricted package name.
-   */
-  public String getRestrictedPackageName() {
-    return restrictedPackageName;
-  }
+	/**
+	 * @return the dryRun
+	 */
+	public Boolean getDryRun() {
+		return dryRun;
+	}
 
-  /**
-   * Gets the payload data, which is immutable.
-   */
-  public Map<String, String> getData() {
-    return data;
-  }
+	/**
+	 * @param dryRun
+	 *            the dryRun to set
+	 */
+	public void setDryRun(Boolean dryRun) {
+		this.dryRun = dryRun;
+	}
 
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder("Message(");
-    if (collapseKey != null) {
-      builder.append("collapseKey=").append(collapseKey).append(", ");
-    }
-    if (timeToLive != null) {
-      builder.append("timeToLive=").append(timeToLive).append(", ");
-    }
-    if (delayWhileIdle != null) {
-      builder.append("delayWhileIdle=").append(delayWhileIdle).append(", ");
-    }
-    if (dryRun != null) {
-      builder.append("dryRun=").append(dryRun).append(", ");
-    }
-    if (restrictedPackageName != null) {
-      builder.append("restrictedPackageName=").append(restrictedPackageName).append(", ");
-    }
-    if (!data.isEmpty()) {
-      builder.append("data: {");
-      for (Map.Entry<String, String> entry : data.entrySet()) {
-        builder.append(entry.getKey()).append("=").append(entry.getValue())
-            .append(",");
-      }
-      builder.delete(builder.length() - 1, builder.length());
-      builder.append("}");
-    }
-    if (builder.charAt(builder.length() - 1) == ' ') {
-      builder.delete(builder.length() - 2, builder.length());
-    }
-    builder.append(")");
-    return builder.toString();
-  }
+	/**
+	 * @return the data
+	 */
+	public Map<String, String> getData() {
+		return data;
+	}
+
+	/**
+	 * @return the notification
+	 */
+	public Map<String, String> getNotification() {
+		return notification;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("Message(");
+		if (collapseKey != null) {
+			builder.append("collapseKey=").append(collapseKey).append(", ");
+		}
+		if (priority != null) {
+			builder.append("priority=").append(priority).append(", ");
+		}
+		if (contentAvailable != null) {
+			builder.append("contentAvailable=").append(contentAvailable)
+					.append(", ");
+		}
+		if (timeToLive != null) {
+			builder.append("timeToLive=").append(timeToLive).append(", ");
+		}
+		if (deliveryReceiptRquested != null) {
+			builder.append("deliveryReceiptRquested=")
+					.append(deliveryReceiptRquested).append(", ");
+		}
+		if (delayWhileIdle != null) {
+			builder.append("delayWhileIdle=").append(delayWhileIdle)
+					.append(", ");
+		}
+		if (restrictedPackageName != null) {
+			builder.append("restrictedPackageName=")
+					.append(restrictedPackageName).append(", ");
+		}
+		if (dryRun != null) {
+			builder.append("dryRun=").append(dryRun).append(", ");
+		}
+		if (!data.isEmpty()) {
+			builder.append("data: {");
+			for (Map.Entry<String, String> entry : data.entrySet()) {
+				builder.append(entry.getKey()).append("=")
+						.append(entry.getValue()).append(",");
+			}
+			builder.delete(builder.length() - 1, builder.length());
+			builder.append("}, ");
+		}
+		if (!notification.isEmpty()) {
+			builder.append("notification: {");
+			for (Map.Entry<String, String> entry : notification.entrySet()) {
+				builder.append(entry.getKey()).append("=")
+						.append(entry.getValue()).append(",");
+			}
+			builder.delete(builder.length() - 1, builder.length());
+			builder.append("}");
+		}
+		if (builder.charAt(builder.length() - 1) == ' ') {
+			builder.delete(builder.length() - 2, builder.length());
+		}
+		builder.append(")");
+		return builder.toString();
+	}
+
+	// TODO get format_message(option)
+	/*
+	 * public String toHttpPlainText() {
+	 * 
+	 * }
+	 */
+	/*
+	 * public JSONObject toHttpJson() {
+	 * 
+	 * }
+	 */
 
 }

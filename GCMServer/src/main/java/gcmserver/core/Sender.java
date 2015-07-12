@@ -17,14 +17,19 @@ package gcmserver.core;
 
 import static gcmserver.core.Constants.GCM_SEND_ENDPOINT;
 import static gcmserver.core.Constants.JSON_CANONICAL_IDS;
+import static gcmserver.core.Constants.JSON_CONTENT_AVAILABLE;
+import static gcmserver.core.Constants.JSON_DELIVERY_RECEIPT_REQUESTED;
 import static gcmserver.core.Constants.JSON_ERROR;
 import static gcmserver.core.Constants.JSON_FAILURE;
 import static gcmserver.core.Constants.JSON_MESSAGE_ID;
 import static gcmserver.core.Constants.JSON_MULTICAST_ID;
-import static gcmserver.core.Constants.JSON_PAYLOAD;
+import static gcmserver.core.Constants.JSON_PAYLOAD_DATA;
+import static gcmserver.core.Constants.JSON_PAYLOAD_NOTIFICATION;
+import static gcmserver.core.Constants.JSON_PRIORITY;
 import static gcmserver.core.Constants.JSON_REGISTRATION_IDS;
 import static gcmserver.core.Constants.JSON_RESULTS;
 import static gcmserver.core.Constants.JSON_SUCCESS;
+import static gcmserver.core.Constants.JSON_TO;
 import static gcmserver.core.Constants.PARAM_COLLAPSE_KEY;
 import static gcmserver.core.Constants.PARAM_DELAY_WHILE_IDLE;
 import static gcmserver.core.Constants.PARAM_DRY_RUN;
@@ -35,13 +40,7 @@ import static gcmserver.core.Constants.PARAM_TIME_TO_LIVE;
 import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
-
 import gcmserver.core.Result.Builder;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -60,6 +59,11 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
@@ -161,12 +165,12 @@ public class Sender {
 	public Result sendNoRetry(Message message, String registrationId)
 			throws IOException {
 		StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
-		Boolean delayWhileIdle = message.isDelayWhileIdle();
+		Boolean delayWhileIdle = message.getDelayWhileIdle();
 		if (delayWhileIdle != null) {
 			addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1"
 					: "0");
 		}
-		Boolean dryRun = message.isDryRun();
+		Boolean dryRun = message.getDryRun();
 		if (dryRun != null) {
 			addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
 		}
@@ -417,21 +421,40 @@ public class Sender {
 			List<String> registrationIds) throws IOException {
 		if (nonNull(registrationIds).isEmpty()) {
 			throw new IllegalArgumentException(
-					"registrationIds cannot be empty");
+					"Field RegistrationIds/To cannot be empty");
 		}
 		Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
-		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+		// Set the options field fields
 		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+		setJsonField(jsonRequest, JSON_PRIORITY, message.getPriority());
+		setJsonField(jsonRequest, JSON_CONTENT_AVAILABLE,
+				message.getContentAvailable());
+		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
+				message.getDelayWhileIdle());
+		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
+				message.getDeliveryReceiptRquested());
 		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
 				message.getRestrictedPackageName());
-		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
-				message.isDelayWhileIdle());
-		setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
-		jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
-		Map<String, String> payload = message.getData();
-		if (!payload.isEmpty()) {
-			jsonRequest.put(JSON_PAYLOAD, payload);
+		setJsonField(jsonRequest, PARAM_DRY_RUN, message.getDryRun());
+		// Set the target or targets of the message
+		if (registrationIds.size() > 1) {
+			// Is a multicast message, we should use the field
+			// JSON_REGISTRATION_IDS
+			jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
+		} else {
+			// Is a single message, we should use the field JSON_TO
+			jsonRequest.put(JSON_TO, registrationIds);
 		}
+		Map<String, String> payload_data = message.getData();
+		if (!payload_data.isEmpty()) {
+			jsonRequest.put(JSON_PAYLOAD_DATA, payload_data);
+		}
+		Map<String, String> payload_notification = message.getNotification();
+		if (!payload_notification.isEmpty()) {
+			jsonRequest.put(JSON_PAYLOAD_NOTIFICATION, payload_notification);
+		}
+		// Generate request body and send
 		String requestBody = JSONValue.toJSONString(jsonRequest);
 		logger.finest("JSON request: " + requestBody);
 		HttpURLConnection conn;
@@ -443,6 +466,7 @@ public class Sender {
 			logger.log(Level.FINE, "IOException posting to GCM", e);
 			return null;
 		}
+		// Process the response
 		String responseBody;
 		if (status != 200) {
 			try {
@@ -457,6 +481,7 @@ public class Sender {
 			}
 			throw new InvalidRequestException(status, responseBody);
 		}
+		//The status is OK 200 so retrieve the body of the response
 		try {
 			responseBody = getAndClose(conn.getInputStream());
 		} catch (IOException e) {
@@ -464,6 +489,7 @@ public class Sender {
 			return null;
 		}
 		logger.finest("JSON response: " + responseBody);
+		//Analyze the response
 		JSONParser parser = new JSONParser();
 		JSONObject jsonResponse;
 		try {

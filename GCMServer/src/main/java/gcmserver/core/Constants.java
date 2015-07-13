@@ -15,7 +15,6 @@
  */
 package gcmserver.core;
 
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Constants used on GCM service communication.

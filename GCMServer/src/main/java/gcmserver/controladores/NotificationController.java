@@ -1,6 +1,7 @@
 package gcmserver.controladores;
 
 import gcmserver.core.Constants;
+import gcmserver.core.DeviceManager;
 import gcmserver.core.Message;
 import gcmserver.core.MulticastResult;
 import gcmserver.core.Result;
@@ -12,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
@@ -31,12 +33,13 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/Notification")
 public class NotificationController {
 
-	protected final Logger logger = Logger.getLogger(getClass().getName());
+	protected final Logger logger = LoggerFactory.getLogger(Sender.class);
 
 	private static final int MULTICAST_SIZE = 1000;
 
 	private Sender sender;
 	private Message message;
+	private DeviceManager deviceMngr;
 
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
@@ -48,6 +51,8 @@ public class NotificationController {
 
 		sender = new Sender(attribute_acces_key);
 		message = new Message();
+		deviceMngr = DeviceManager.getInstance();
+		//TODO init list of regIds
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -85,7 +90,7 @@ public class NotificationController {
 		}
 
 		// Logging the status to system log y web log
-		logger.fine(status);
+		logger.info(status);
 
 		modelo.addAttribute("message", message);
 		modelo.addAttribute("response", result.toString());
@@ -93,23 +98,77 @@ public class NotificationController {
 	}
 
 	/**
-	 * Send a message to a single target, a notification group or a multiple
-	 * targets via HTTP using JSON
+	 * Send a message to a single target via HTTP using JSON
 	 * 
 	 * @param targets
-	 * @param message
+	 * @param messageSingleJSON
 	 * @param sesion
 	 * @param modelo
 	 */
 	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.GET)
-	protected void notificationHttpJson(@RequestParam List<String> targets,
-			@ModelAttribute Message message, HttpSession sesion, Model modelo) {
+	protected ModelAndView notificationHttpJson(
+			@ModelAttribute Message messageSingleJSON, HttpSession sesion,
+			Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
-		List<String> devices = targets;
+		List<String> targetList = new ArrayList<String>();
+		targetList.add(messageSingleJSON.getTarget());
 		String status;
-		if (devices.isEmpty()) {
+		if (targetList.isEmpty()) {
+			status = "Message ignored as there is no target devices!";
+		} else {
+			
+			//TODO simplify the logic in order to no use the asynchsend()
+			// send a multicast or single message using JSON
+			// NOTE: a real application
+			// could always send a multicast, even for just one recipient.
+			// Thus if we want to send a single message we pass one device only
+			// If we are sending a multicast message using JSON
+			// we must split in chunks of 1000 devices due to GCM limit
+
+			int total = targetList.size();
+			List<String> partialTargets = new ArrayList<String>(total);
+			int counter = 0;
+			int tasks = 0;
+			for (String target : targetList) {
+				counter++;
+				partialTargets.add(target);
+				int partialSize = partialTargets.size();
+				if (partialSize == MULTICAST_SIZE || counter == total) {
+					asyncSend(partialTargets, messageSingleJSON);
+					partialTargets.clear();
+					tasks++;
+				}
+			}
+			status = "Asynchronously sending " + tasks
+					+ " multicast messages to " + total + " devices";
+		}
+		logger.info(status);
+		// TODO recuperar la multiastResponse
+		modelo.addAttribute("message", messageSingleJSON);
+		// modelo.addAttribute("response", result.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
+	}
+
+	/**
+	 * Send a message to multiples targets via HTTP using JSON
+	 * 
+	 * @param targets
+	 * @param messageMultiJSON
+	 * @param sesion
+	 * @param modelo
+	 */
+	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.GET)
+	protected ModelAndView notificationHttpJsonMulti(
+			@ModelAttribute Message messageMultiJSON, HttpSession sesion,
+			Model modelo) {
+		/*
+		 * TODO Send http JSON notification
+		 */
+		List<String> targetList = messageMultiJSON.getListTargets();
+		String status;
+		if (targetList.isEmpty()) {
 			status = "Message ignored as there is no target devices!";
 		} else {
 			// send a multicast or single message using JSON
@@ -119,24 +178,28 @@ public class NotificationController {
 			// If we are sending a multicast message using JSON
 			// we must split in chunks of 1000 devices due to GCM limit
 
-			int total = devices.size();
-			List<String> partialDevices = new ArrayList<String>(total);
+			int total = targetList.size();
+			List<String> partialTargets = new ArrayList<String>(total);
 			int counter = 0;
 			int tasks = 0;
-			for (String device : devices) {
+			for (String target : targetList) {
 				counter++;
-				partialDevices.add(device);
-				int partialSize = partialDevices.size();
+				partialTargets.add(target);
+				int partialSize = partialTargets.size();
 				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialDevices, message);
-					partialDevices.clear();
+					asyncSend(partialTargets, messageMultiJSON);
+					partialTargets.clear();
 					tasks++;
 				}
 			}
 			status = "Asynchronously sending " + tasks
 					+ " multicast messages to " + total + " devices";
 		}
-		logger.fine(status);
+		logger.info(status);
+		// TODO recuperar la multiastResponse
+		modelo.addAttribute("message", messageMultiJSON);
+		// modelo.addAttribute("response", result.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
 	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.GET)
@@ -150,12 +213,12 @@ public class NotificationController {
 	/**
 	 * Send asynchronously the message to the partial list of devices
 	 * 
-	 * @param partialDevices
+	 * @param partialTargets
 	 * @param message
 	 */
-	private void asyncSend(List<String> partialDevices, Message message) {
+	private void asyncSend(List<String> partialTargets, Message message) {
 		// make a copy
-		final List<String> devices = new ArrayList<String>(partialDevices);
+		final List<String> devices = new ArrayList<String>(partialTargets);
 
 		threadPool.execute(new Runnable() {
 
@@ -165,7 +228,7 @@ public class NotificationController {
 				try {
 					multicastResult = sender.send(message, devices, 5);
 				} catch (IOException e) {
-					logger.log(Level.SEVERE, "Error posting messages", e);
+					logger.error("Error posting messages", e);
 					return;
 				}
 				List<Result> results = multicastResult.getResults();
@@ -175,7 +238,7 @@ public class NotificationController {
 					Result result = results.get(i);
 					String messageId = result.getMessageId();
 					if (messageId != null) {
-						logger.fine("Succesfully sent message to device: "
+						logger.info("Succesfully sent message to device: "
 								+ regId + "; messageId = " + messageId);
 						String canonicalRegId = result
 								.getCanonicalRegistrationId();
@@ -183,7 +246,8 @@ public class NotificationController {
 							// same device has more than on registration id:
 							// update it
 							logger.info("canonicalRegId " + canonicalRegId);
-							Datastore.updateRegistration(regId, canonicalRegId);
+							deviceMngr
+									.updateRegistration(regId, canonicalRegId);
 						}
 					} else {
 						String error = result.getErrorCodeName();
@@ -193,7 +257,7 @@ public class NotificationController {
 							logger.info("Unregistered device: " + regId);
 							Datastore.unregister(regId);
 						} else {
-							logger.severe("Error sending message to " + regId
+							logger.error("Error sending message to " + regId
 									+ ": " + error);
 						}
 					}

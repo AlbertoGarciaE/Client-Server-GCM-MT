@@ -17,6 +17,7 @@ package gcmserver.core;
 
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,7 @@ import java.util.Map;
  */
 public final class Message implements Serializable {
 	private String target;
+	private List<String> listTargets;
 	// optional parameters
 	private String collapseKey;
 	private Integer priority;
@@ -190,7 +192,7 @@ public final class Message implements Serializable {
 	public Map<String, String> getNotification() {
 		return notification;
 	}
-
+//TODO add target a el metodo to string
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Message(");
@@ -247,16 +249,18 @@ public final class Message implements Serializable {
 		return builder.toString();
 	}
 
-	// TODO get format_message(option)
-	/*
-	 * public String toHttpPlainText() {
-	 * 
-	 * }
+	/**
+	 * @return the listTargets
 	 */
-	/*
-	 * public JSONObject toHttpJson() {
-	 * 
-	 * }
+	public List<String> getListTargets() {
+		return listTargets;
+	}
+
+	/**
+	 * @param listTargets the listTargets to set
 	 */
+	public void setListTargets(List<String> listTargets) {
+		this.listTargets = listTargets;
+	}
 
 }

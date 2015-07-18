@@ -86,7 +86,7 @@ public class Sender {
 			.getLogger(Sender.class);
 
 	private final String key;
-
+//TODO add group message functions
 	/**
 	 * Default constructor.
 	 *

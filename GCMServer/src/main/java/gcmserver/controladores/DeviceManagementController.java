@@ -1,58 +1,109 @@
-/*
- * Copyright 2012 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package gcmserver.controladores;
 
+import gcmserver.core.Device;
+import gcmserver.core.DeviceManager;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Servlet that unregisters a device, whose registration id is identified by
- * {@link #PARAMETER_REG_ID}.
- * <p>
- * The client app should call this servlet everytime it receives a
- * {@code com.google.android.c2dm.intent.REGISTRATION} with an
- * {@code unregistered} extra.
+ * 
+ * @author Usuario
+ *
  */
-@SuppressWarnings("serial")
+
 @Controller
 @RequestMapping("/deviceManagement")
-public class DeviceManagementController  {
+public class DeviceManagementController {
 
-  private static final String PARAMETER_REG_ID = "regId";
-//DeviceManager.class
+	private DeviceManager deviceMngr;
+	private Device newDevice;
+	private static final Logger logger = LoggerFactory
+			.getLogger(DeviceManagementController.class);
 
-  @RequestMapping(value="/unregisterDevice", method=RequestMethod.GET)
-  protected void unregisterDevice(@RequestParam String regId, HttpSession sesion, Model modelo) {
-    /*
-     * TODO Unregister a device
-     */
-  }
+	@PostConstruct
+	public void init() {
 
-  @RequestMapping(value="/registerDevice", method=RequestMethod.GET)
-  protected void registerDevice(@RequestParam String regId, HttpSession sesion, Model modelo) {
-    /*
-     * TODO register a device
-     */
-  }
-  
-  
+		deviceMngr = DeviceManager.getInstance();
+		newDevice = new Device();
+
+	}
+
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ModelAndView home(Model modelo) {
+
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("newDevice", newDevice);
+
+		logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
+	}
+
+	@RequestMapping(value = "/unregisterDevice", method = RequestMethod.GET)
+	protected ModelAndView unregisterDevice(@RequestParam String regId,
+			HttpSession sesion, Model modelo) {
+		/*
+		 * TODO Unregister service
+		 */
+
+		deviceMngr.unregisterDevice(new Device("aux", regId));
+
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("newDevice", newDevice);
+
+		logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
+	}
+
+	@RequestMapping(value = "/registerDevice", method = RequestMethod.GET)
+	protected ModelAndView registerDevice(@ModelAttribute Device newDevice,
+			HttpSession sesion, Model modelo) {
+		/*
+		 * TODO register service
+		 */
+
+		deviceMngr.registerDevice(newDevice);
+
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("newDevice", newDevice);
+		logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", modelo);
+
+	}
+
+	@RequestMapping(value = "/createGroup", method = RequestMethod.GET)
+	protected void createGroup(@RequestParam String regId, HttpSession sesion,
+			Model modelo) {
+		/*
+		 * TODO create a group of devices under a same notification key
+		 */
+	}
+
+	@RequestMapping(value = "/addToGroup", method = RequestMethod.GET)
+	protected void addToGroup(@RequestParam String regId, HttpSession sesion,
+			Model modelo) {
+		/*
+		 * TODO add a device to a group of devices under a same notification key
+		 */
+	}
+
+	@RequestMapping(value = "/removeFromGroup", method = RequestMethod.GET)
+	protected void removeFromGroup(@RequestParam String regId,
+			HttpSession sesion, Model modelo) {
+		/*
+		 * TODO remove a device from a group of devices under a same
+		 * notification key
+		 */
+	}
+
 }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GCM testing tool</title>
+<title>GCM testing tool</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+
+<!--stylesheets / link tags loaded here-->
+
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></link>
+<link
+	href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
+	rel="stylesheet"></link>
+
+<style type="text/css">
+.form-group.required .control-label:after {
+	content: "*";
+	color: red;
+}
+</style>
+</head>
+<body>
+	<div class="navbar navbar-default">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">GCM testing tool</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li><a href="#" th:ref="@{/Notification/}">Downstream</a></li>
+			<li><a href="#">Upstream</a></li>
+			<li><a href="#">Groups</a></li>
+			<li><a href="#">Topics</a></li>
+			<li class="active"><a href="#" th:ref="@{/deviceManagement/}">Devices</a></li>
+			<li class="divider-vertical"></li>
+			<li><a href="#">Settings</a></li>
+		</ul>
+	</div>
+	<div class="container">
+		<div class="col-md-12">
+			<h2>Devices Management</h2>
+			<p>In this section you can manage the registration id of the
+				different devices you will use within this tool</p>
+			<h3>Add device</h3>
+			<form id="form_register_device" class="form-inline" role="form" action="#"
+				th:action="@{/deviceManagement/registerDevice}" th:object="${newDevice}"
+				method="post">
+				<div class="form-group required">
+					<label for="input_registration_id" class="control-label">registration_id</label>
+
+					<input type="text" class="form-control" id="input_registration_id"
+						placeholder="registration_id" th:field="*{name}"></input>
+
+				</div>
+				<div class="form-group required">
+					<label for="input_device_name" class="control-label">Device
+						name</label> <input type="text" class="form-control"
+						id="input_device_name" placeholder="device name"
+						th:field="*{registrationId}"></input>
+
+				</div>
+				<button type="submit" class="btn btn-default">Send</button>
+
+			</form>
+			<h3>Devices</h3>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Device name</th>
+						<th>Registration_id</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="${device : modelo.deviceList}" th:inline="text">
+						<td>[[${device.name}]]</td>
+						<td>[[${device.registrationId}]]</td>
+						<td><a href="#"
+							th:href="@{/deviceManagement/unregisterDevice(regId=${device.registrationId})}"
+							class="btn btn-default btn-sm">Remove</a></td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+	<!--scripts loaded here-->
+	<script
+		src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script
+		src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
+</html>

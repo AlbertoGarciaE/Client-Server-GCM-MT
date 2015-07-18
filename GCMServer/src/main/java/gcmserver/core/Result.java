@@ -51,6 +51,7 @@ public final class Result implements Serializable {
 
   public static final class Builder {
 
+	  //TODO esta clase vale tambien para los topic menssage results
     // optional parameters
     private String messageId;
     private String canonicalRegistrationId;

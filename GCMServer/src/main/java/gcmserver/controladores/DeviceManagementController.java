@@ -46,7 +46,7 @@ public class DeviceManagementController {
 		modelo.addAttribute("newDevice", newDevice);
 
 		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		return new ModelAndView("Devices", "modelo", modelo);
 	}
 
 	@RequestMapping(value = "/unregisterDevice", method = RequestMethod.GET)
@@ -62,10 +62,10 @@ public class DeviceManagementController {
 		modelo.addAttribute("newDevice", newDevice);
 
 		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		return new ModelAndView("Devices", "modelo", modelo);
 	}
 
-	@RequestMapping(value = "/registerDevice", method = RequestMethod.GET)
+	@RequestMapping(value = "/registerDevice", method = RequestMethod.POST)
 	protected ModelAndView registerDevice(@ModelAttribute Device newDevice,
 			HttpSession sesion, Model modelo) {
 		/*
@@ -77,7 +77,7 @@ public class DeviceManagementController {
 		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
 		modelo.addAttribute("newDevice", newDevice);
 		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		return new ModelAndView("Devices", "modelo", modelo);
 
 	}
 

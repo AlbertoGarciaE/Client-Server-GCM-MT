@@ -13,13 +13,20 @@ public class Device {
 	}
 
 	/**
+	 * 
+	 */
+	public Device(Device device) {
+		this.name = new String(device.getName());
+		this.registrationId = new String(device.getRegistrationId());
+	}
+
+	/**
 	 * @param name
 	 * @param registrationId
 	 */
 	public Device(String name, String registrationId) {
-		super();
-		this.name = name;
-		this.registrationId = registrationId;
+		this.name = new String(name);
+		this.registrationId = new String(registrationId);
 	}
 
 	/**
@@ -79,7 +86,7 @@ public class Device {
 			builder.append(" registrationId=").append(registrationId);
 		}
 
-		builder.append("]");
+		builder.append(" ]");
 		return builder.toString();
 	}
 

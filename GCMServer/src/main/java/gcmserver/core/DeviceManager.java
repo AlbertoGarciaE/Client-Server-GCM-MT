@@ -1,7 +1,10 @@
 package gcmserver.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class DeviceManager {
 
@@ -28,7 +31,6 @@ public class DeviceManager {
 	 */
 	private DeviceManager() {
 		this.deviceList = new ArrayList<Device>();
-		load();
 	}
 
 	/**
@@ -36,7 +38,7 @@ public class DeviceManager {
 	 * @param device
 	 */
 	public void registerDevice(Device device) {
-		this.deviceList.add(device);
+		this.deviceList.add(new Device(device));
 	}
 
 	/**
@@ -52,11 +54,19 @@ public class DeviceManager {
 	 * @return List<Device>
 	 */
 	public List<Device> getdeviceList() {
-		return deviceList;
+		return new ArrayList<Device>(deviceList);
 	}
 
-	public void load() {
-		// TODO load list of devices from a source
+	@SuppressWarnings("rawtypes")
+	public void load(HashMap<String, String> list) {
+		Iterator it = list.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry elemento = (Map.Entry) it.next();
+			String name = elemento.getKey().toString();
+			String regId = elemento.getValue().toString();
+			this.deviceList.add(new Device(name, regId));
+		}
+
 	}
 
 	public void save() {
@@ -64,7 +74,10 @@ public class DeviceManager {
 	}
 
 	public void updateRegistration(String regId, String canonicalRegId) {
-		// TODO change the regId old for a new canonical regId
+		Device aux = new Device("aux", regId);
+		int index = this.deviceList.indexOf(aux);
+		this.deviceList.get(index).setRegistrationId(canonicalRegId);
+
 	}
 
 }

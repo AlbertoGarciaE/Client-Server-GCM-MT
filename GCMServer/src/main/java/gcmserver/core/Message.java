@@ -33,7 +33,7 @@ public final class Message implements Serializable {
 	private Boolean contentAvailable;
 	private Boolean delayWhileIdle;
 	private Integer timeToLive;
-	private Boolean deliveryReceiptRquested;
+	private Boolean deliveryReceiptRequested;
 	private String restrictedPackageName;
 	private Boolean dryRun;
 
@@ -135,18 +135,18 @@ public final class Message implements Serializable {
 	}
 
 	/**
-	 * @return the deliveryReceiptRquested
+	 * @return the deliveryReceiptRequested
 	 */
-	public Boolean getDeliveryReceiptRquested() {
-		return deliveryReceiptRquested;
+	public Boolean getDeliveryReceiptRequested() {
+		return deliveryReceiptRequested;
 	}
 
 	/**
-	 * @param deliveryReceiptRquested
-	 *            the deliveryReceiptRquested to set
+	 * @param deliveryReceiptRequested
+	 *            the deliveryReceiptRequested to set
 	 */
-	public void setDeliveryReceiptRquested(Boolean deliveryReceiptRquested) {
-		this.deliveryReceiptRquested = deliveryReceiptRquested;
+	public void setDeliveryReceiptRequested(Boolean deliveryReceiptRquested) {
+		this.deliveryReceiptRequested = deliveryReceiptRquested;
 	}
 
 	/**
@@ -209,9 +209,9 @@ public final class Message implements Serializable {
 		if (timeToLive != null) {
 			builder.append("timeToLive=").append(timeToLive).append(", ");
 		}
-		if (deliveryReceiptRquested != null) {
+		if (deliveryReceiptRequested != null) {
 			builder.append("deliveryReceiptRquested=")
-					.append(deliveryReceiptRquested).append(", ");
+					.append(deliveryReceiptRequested).append(", ");
 		}
 		if (delayWhileIdle != null) {
 			builder.append("delayWhileIdle=").append(delayWhileIdle)

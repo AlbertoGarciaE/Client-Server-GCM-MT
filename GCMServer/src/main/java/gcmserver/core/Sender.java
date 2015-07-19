@@ -431,7 +431,7 @@ public class Sender {
 				message.getDelayWhileIdle());
 		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
 		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
-				message.getDeliveryReceiptRquested());
+				message.getDeliveryReceiptRequested());
 		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
 				message.getRestrictedPackageName());
 		setJsonField(jsonRequest, PARAM_DRY_RUN, message.getDryRun());

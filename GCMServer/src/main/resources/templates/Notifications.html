@@ -29,11 +29,11 @@
 			<a class="navbar-brand" href="#">GCM testing tool</a>
 		</div>
 		<ul class="nav navbar-nav">
-			<li class="active"><a href="#" th:ref="@{/Notification/}">Downstream</a></li>
+			<li class="active"><a href="#" th:href="@{/Notification/}">Downstream</a></li>
 			<li><a href="#">Upstream</a></li>
 			<li><a href="#">Groups</a></li>
 			<li><a href="#">Topics</a></li>
-			<li><a href="#" th:ref="@{/deviceManagement/}">Devices</a></li>
+			<li><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
 			<li class="divider-vertical"></li>
 			<li><a href="#">Settings</a></li>
 		</ul>
@@ -63,7 +63,7 @@
 						<p>From to create a GCM notification using HTTP and plain text</p>
 						<form id="form_http_plain" class="form-horizontal" role="form"
 							action="#" th:action="@{/Notification/notificationHttpPlain}"
-							th:object="${message}" method="post">
+							th:object="${messagePlain}" method="post">
 							<h3>Target</h3>
 							<div class="form-group required">
 								<label for="input_registration_id"
@@ -71,11 +71,10 @@
 								<div class="col-lg-8">
 									<select class="form-control" id="input_registration_id"
 										required="" th:field="*{target}">
-										<option value=""></option>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
+										<option value="">Select one...</option>
+										<option th:each="device : ${deviceList}"
+											th:value="${device.registrationId}" th:text="${device.name}"
+											value="Uno">Uno</option>
 									</select>
 								</div>
 							</div>
@@ -84,7 +83,7 @@
 								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
 								<div class="col-lg-8">
 									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}">
+										placeholder="collapse_key" th:field="*{collapseKey}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -93,7 +92,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}">Check
+											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -105,7 +104,7 @@
 									<div class="input-group">
 										<input type="number" max="2419200" min="0"
 											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}">
+											placeholder="time_to_live" th:field="*{timeToLive}"></input>
 										<span class="input-group-addon">sec</span>
 									</div>
 									<p id="helpBlock" class="help-block">This parameter
@@ -121,7 +120,7 @@
 									<input type="text" class="form-control"
 										id="input_restricted_package_name"
 										placeholder="restricted_package_name"
-										th:field="*{restrictedPackageName}">
+										th:field="*{restrictedPackageName}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -129,7 +128,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}">Check / Uncheck
+											th:field="*{dryRun}"></input>Check / Uncheck
 										</label>
 									</div>
 								</div>
@@ -142,8 +141,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-lg-offset-2 col-lg-10">
+								<div class="col-lg-offset-6 col-lg-6">
 									<button type="submit" class="btn btn-default">Send</button>
+									<button type="reset" class="btn btn-default">Clear</button>
 								</div>
 							</div>
 						</form>
@@ -156,24 +156,17 @@
 							format</p>
 						<form id="form_http_json" class="form-horizontal" role="form"
 							action="#" th:action="@{/Notification/notificationHttpJSON}"
-							th:object="${message}" method="post">
+							th:object="${messageJson}" method="post">
 							<h3>Target</h3>
 							<div class="form-group required">
 								<label for="input_to" class="col-lg-4 control-label">to</label>
 								<div class="col-lg-8">
 									<select class="form-control" id="input_to" required=""
 										th:field="*{target}">
-										<option value=""></option>
-										<optgroup label="Device ID"></optgroup>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
-										<optgroup label="Notification key"></optgroup>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
+										<option value="">Select one...</option>
+										<option th:each="device : ${deviceList}"
+											th:value="${device.registrationId}" th:text="${device.name}"
+											value="Uno">Uno</option>
 									</select>
 								</div>
 							</div>
@@ -182,7 +175,7 @@
 								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
 								<div class="col-lg-8">
 									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}">
+										placeholder="collapse_key" th:field="*{collapseKey}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -190,7 +183,7 @@
 								<div class="col-lg-8">
 									<input type="number" max="10" min="0" class="form-control"
 										id="input_priority" placeholder="priority"
-										th:field="*{priority}">
+										th:field="*{priority}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -199,7 +192,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_content_available" th:field="*{contentAvailable}">Check
+											id="input_content_available" th:field="*{contentAvailable}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -211,7 +204,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}">Check
+											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -223,7 +216,7 @@
 									<div class="input-group">
 										<input type="number" max="2419200" min="0"
 											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}"><span
+											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
 											class="input-group-addon">sec</span>
 									</div>
 									<p id="helpBlock" class="help-block">This parameter
@@ -239,7 +232,7 @@
 									<input type="text" class="form-control"
 										id="input_restricted_package_name"
 										placeholder="restricted_package_name"
-										th:field="*{restrictedPackageName}">
+										th:field="*{restrictedPackageName}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -247,7 +240,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}">Check / Uncheck
+											th:field="*{dryRun}"></input>Check / Uncheck
 										</label>
 									</div>
 								</div>
@@ -268,14 +261,15 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-lg-offset-2 col-lg-10">
+								<div class="col-lg-offset-6 col-lg-6">
 									<button type="submit" class="btn btn-default">Send</button>
+									<button type="reset" class="btn btn-default">Clear</button>
 								</div>
 							</div>
 						</form>
 					</div>
 					<!-- END Tab HTTP JSON -->
-					<!-- Tab HTTP JSON Multi-->
+					<!-- Tab HTTP JSON Multi -->
 					<div role="tabpanel" class="tab-pane" id="http_json_multi">
 						<h2>HTTP JSON Multi</h2>
 						<p>From to create a GCM notification for multiple devices
@@ -283,19 +277,18 @@
 						<form id="form_http_json_multi" class="form-horizontal"
 							role="form" action="#"
 							th:action="@{/Notification/notificationHttpJSONMulti}"
-							th:object="${message}" method="post">
+							th:object="${messageJsonMulti}" method="post">
 							<h3>Target</h3>
 							<div class="form-group required">
 								<label for="input_registration_ids"
 									class="col-lg-4 control-label">registration_ids</label>
 								<div class="col-lg-8">
 									<select class="form-control" id="input_registration_ids"
-										required="" multiple="">
-										<option value=""></option>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
+										required="" multiple="" th:field="*{target}">
+										<option value="">Select one...</option>
+										<option th:each="device : ${deviceList}"
+											th:value="${device.registrationId}" th:text="${device.name}"
+											value="Uno">Uno</option>
 									</select>
 								</div>
 							</div>
@@ -304,7 +297,7 @@
 								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
 								<div class="col-lg-8">
 									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}">
+										placeholder="collapse_key" th:field="*{collapseKey}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -312,7 +305,7 @@
 								<div class="col-lg-8">
 									<input type="number" max="10" min="0" class="form-control"
 										id="input_priority" placeholder="priority"
-										th:field="*{priority}">
+										th:field="*{priority}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -321,7 +314,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_content_available" th:field="*{contentAvailable}">Check
+											id="input_content_available" th:field="*{contentAvailable}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -333,7 +326,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}">Check
+											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -345,7 +338,7 @@
 									<div class="input-group">
 										<input type="number" max="2419200" min="0"
 											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}"><span
+											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
 											class="input-group-addon">sec</span>
 									</div>
 									<p id="helpBlock" class="help-block">This parameter
@@ -361,7 +354,7 @@
 									<input type="text" class="form-control"
 										id="input_restricted_package_name"
 										placeholder="restricted_package_name"
-										th:field="*{restrictedPackageName}">
+										th:field="*{restrictedPackageName}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -369,7 +362,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}">Check / Uncheck
+											th:field="*{dryRun}"></input>Check / Uncheck
 										</label>
 									</div>
 								</div>
@@ -390,8 +383,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-lg-offset-2 col-lg-10">
+								<div class="col-lg-offset-6 col-lg-6">
 									<button type="submit" class="btn btn-default">Send</button>
+									<button type="reset" class="btn btn-default">Clear</button>
 								</div>
 							</div>
 						</form>
@@ -401,24 +395,19 @@
 					<div role="tabpanel" class="tab-pane" id="xmpp">
 						<h2>XMPP</h2>
 						<p>From to create a GCM notification using XMPP</p>
-						<form id="form_xmpp" class="form-horizontal" role="form">
+						<form id="form_xmpp" class="form-horizontal" role="form"
+							action="#" th:action="@{/Notification/notificationXMPP}"
+							th:object="${messageXMPP}" method="post">
 							<h3>Target</h3>
 							<div class="form-group required">
 								<label for="input_to" class="col-lg-4 control-label">to</label>
 								<div class="col-lg-8">
 									<select class="form-control" id="input_to" required=""
 										th:field="*{target}">
-										<option value=""></option>
-										<optgroup label="Device ID"></optgroup>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
-										<optgroup label="Notification key"></optgroup>
-										<option value="uno">Uno</option>
-										<option value="dos">dos</option>
-										<option value="tres">tres</option>
-										<option value="cuatro">cuatro</option>
+										<option value="">Select one...</option>
+										<option th:each="device : ${deviceList}"
+											th:value="${device.registrationId}" th:text="${device.name}"
+											value="Uno">Uno</option>
 									</select>
 								</div>
 							</div>
@@ -427,7 +416,7 @@
 								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
 								<div class="col-lg-8">
 									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}">
+										placeholder="collapse_key" th:field="*{collapseKey}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -435,7 +424,7 @@
 								<div class="col-lg-8">
 									<input type="number" max="10" min="0" class="form-control"
 										id="input_priority" placeholder="priority"
-										th:field="*{priority}">
+										th:field="*{priority}"></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -444,7 +433,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_content_available" th:field="*{contentAvailable}">Check
+											id="input_content_available" th:field="*{contentAvailable}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -456,7 +445,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}">Check
+											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
 											/ Uncheck
 										</label>
 									</div>
@@ -468,7 +457,7 @@
 									<div class="input-group">
 										<input type="number" max="2419200" min="0"
 											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}"><span
+											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
 											class="input-group-addon">sec</span>
 									</div>
 									<p id="helpBlock" class="help-block">This parameter
@@ -484,7 +473,7 @@
 									<div class="checkbox">
 										<label> <input type="checkbox"
 											id="input_delivery_receipt_requested"
-											th:field="*{deliveryReceiptRequested}">Check /
+											th:field="*{deliveryReceiptRequested}"></input>Check /
 											Uncheck
 										</label>
 									</div>
@@ -495,7 +484,7 @@
 								<div class="col-lg-8">
 									<div class="checkbox">
 										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}">Check / Uncheck
+											th:field="*{dryRun}"></input>Check / Uncheck
 										</label>
 									</div>
 								</div>
@@ -517,8 +506,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-lg-offset-2 col-lg-10">
+								<div class="col-lg-offset-6 col-lg-6">
 									<button type="submit" class="btn btn-default">Send</button>
+									<button type="reset" class="btn btn-default">Clear</button>
 								</div>
 							</div>
 						</form>

@@ -1,6 +1,7 @@
 package gcmserver.controladores;
 
 import gcmserver.core.Constants;
+import gcmserver.core.Device;
 import gcmserver.core.DeviceManager;
 import gcmserver.core.Message;
 import gcmserver.core.MulticastResult;
@@ -38,8 +39,12 @@ public class NotificationController {
 	private static final int MULTICAST_SIZE = 1000;
 
 	private Sender sender;
-	private Message message;
+	private Message messagePlain;
+	private Message messageJson;
+	private Message messageJsonMulti;
+	private Message messageXMPP;
 	private DeviceManager deviceMngr;
+	private List<Device> deviceList;
 
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
@@ -50,14 +55,23 @@ public class NotificationController {
 	public void init() {
 
 		sender = new Sender(attribute_acces_key);
-		message = new Message();
+		messagePlain = new Message();
+		messageJson = new Message();
+		messageJsonMulti = new Message();
+		messageXMPP = new Message();
 		deviceMngr = DeviceManager.getInstance();
+		deviceList = deviceMngr.getdeviceList();
 		//TODO init list of regIds
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(Model modelo) {
-		modelo.addAttribute("message", message);
+		modelo.addAttribute("messagePlain", messagePlain);
+		modelo.addAttribute("messageJson", messageJson);
+		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		modelo.addAttribute("messageXMPP", messageXMPP);
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
@@ -94,6 +108,7 @@ public class NotificationController {
 
 		modelo.addAttribute("message", message);
 		modelo.addAttribute("response", result.toString());
+		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
@@ -148,6 +163,7 @@ public class NotificationController {
 		// TODO recuperar la multiastResponse
 		modelo.addAttribute("message", messageSingleJSON);
 		// modelo.addAttribute("response", result.toString());
+		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
@@ -199,6 +215,7 @@ public class NotificationController {
 		// TODO recuperar la multiastResponse
 		modelo.addAttribute("message", messageMultiJSON);
 		// modelo.addAttribute("response", result.toString());
+		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 

@@ -5,4 +5,4 @@
  * @author Usuario
  *
  */
-package gcmserver.serverlets;
+package gcmserver.persistence;

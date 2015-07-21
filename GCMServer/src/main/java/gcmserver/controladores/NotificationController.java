@@ -7,7 +7,7 @@ import gcmserver.core.Message;
 import gcmserver.core.MulticastResult;
 import gcmserver.core.Result;
 import gcmserver.core.Sender;
-import gcmserver.serverlets.Datastore;
+import gcmserver.persistence.Datastore;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -233,7 +233,7 @@ public class NotificationController {
 	 * @param partialTargets
 	 * @param message
 	 */
-	private void asyncSend(List<String> partialTargets, Message message) {
+	private void asyncSend(List<String> partialTargets, final Message message) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialTargets);
 
@@ -272,7 +272,7 @@ public class NotificationController {
 							// application has been removed from device -
 							// unregister it
 							logger.info("Unregistered device: " + regId);
-							Datastore.unregister(regId);
+							//Datastore.unregister(regId);
 						} else {
 							logger.error("Error sending message to " + regId
 									+ ": " + error);

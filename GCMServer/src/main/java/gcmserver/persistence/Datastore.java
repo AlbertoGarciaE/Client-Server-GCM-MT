@@ -20,10 +20,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Simple implementation of a data store using standard Java collections.
- * <p>
- * This class is thread-safe but not persistent (it will lost the data when the
- * app is restarted) - it is meant just as an example.
+ * Simple implementation of a data store using XML files.
  */
 public final class Datastore {
 

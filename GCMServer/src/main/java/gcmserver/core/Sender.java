@@ -40,7 +40,10 @@ import static gcmserver.core.Constants.PARAM_TIME_TO_LIVE;
 import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
-import gcmserver.core.Result.Builder;
+import gcmserver.controllers.model.Message;
+import gcmserver.model.MulticastResult;
+import gcmserver.model.Result;
+import gcmserver.model.Result.Builder;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -57,9 +60,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;

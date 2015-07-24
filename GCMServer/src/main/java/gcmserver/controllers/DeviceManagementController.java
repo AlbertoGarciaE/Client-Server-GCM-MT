@@ -1,7 +1,8 @@
-package gcmserver.controladores;
+package gcmserver.controllers;
 
-import gcmserver.core.Device;
+import gcmserver.controllers.model.DeviceViewModel;
 import gcmserver.core.DeviceManager;
+import gcmserver.model.Devices;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
@@ -27,7 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class DeviceManagementController {
 
 	private DeviceManager deviceMngr;
-	private Device newDevice;
+	private DeviceViewModel newDevice;
 	private static final Logger logger = LoggerFactory
 			.getLogger(DeviceManagementController.class);
 
@@ -35,14 +36,16 @@ public class DeviceManagementController {
 	public void init() {
 
 		deviceMngr = DeviceManager.getInstance();
-		newDevice = new Device();
+		// Load devices stored in XML file
+		deviceMngr.load();
+		newDevice = new DeviceViewModel();
 
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(Model modelo) {
 
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
 		modelo.addAttribute("newDevice", newDevice);
 
 		logger.info("Modelo: " + modelo.toString());
@@ -56,54 +59,35 @@ public class DeviceManagementController {
 		 * TODO Unregister service
 		 */
 
-		deviceMngr.unregisterDevice(new Device("aux", regId));
+		deviceMngr.unregisterDevice(regId);
 
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
 		modelo.addAttribute("newDevice", newDevice);
+		// Save to XML file
+		deviceMngr.save();
 
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Devices", "modelo", modelo);
 	}
 
 	@RequestMapping(value = "/registerDevice", method = RequestMethod.POST)
-	protected ModelAndView registerDevice(@ModelAttribute Device newDevice,
-			HttpSession sesion, Model modelo) {
+	protected ModelAndView registerDevice(
+			@ModelAttribute DeviceViewModel newDevice, HttpSession sesion,
+			Model modelo) {
 		/*
 		 * TODO register service
 		 */
 
-		deviceMngr.registerDevice(newDevice);
+		deviceMngr.registerDevice(newDevice.getName(),
+				newDevice.getRegistrationId());
+		// Save to XML file
+		deviceMngr.save();
 
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
 		modelo.addAttribute("newDevice", newDevice);
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Devices", "modelo", modelo);
 
-	}
-
-	@RequestMapping(value = "/createGroup", method = RequestMethod.GET)
-	protected void createGroup(@RequestParam String regId, HttpSession sesion,
-			Model modelo) {
-		/*
-		 * TODO create a group of devices under a same notification key
-		 */
-	}
-
-	@RequestMapping(value = "/addToGroup", method = RequestMethod.GET)
-	protected void addToGroup(@RequestParam String regId, HttpSession sesion,
-			Model modelo) {
-		/*
-		 * TODO add a device to a group of devices under a same notification key
-		 */
-	}
-
-	@RequestMapping(value = "/removeFromGroup", method = RequestMethod.GET)
-	protected void removeFromGroup(@RequestParam String regId,
-			HttpSession sesion, Model modelo) {
-		/*
-		 * TODO remove a device from a group of devices under a same
-		 * notification key
-		 */
 	}
 
 }

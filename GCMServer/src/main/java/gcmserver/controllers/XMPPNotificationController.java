@@ -1,4 +1,4 @@
-package gcmserver.controladores;
+package gcmserver.controllers;
 
 public class XMPPNotificationController {
 

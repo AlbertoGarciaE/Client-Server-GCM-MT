@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gcmserver.core;
+package gcmserver.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +21,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import gcmserver.model.MulticastResult;
+import gcmserver.model.Result;
 
 import java.util.Arrays;
 import java.util.List;

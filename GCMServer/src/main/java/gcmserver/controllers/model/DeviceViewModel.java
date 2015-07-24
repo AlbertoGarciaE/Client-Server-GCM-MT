@@ -1,6 +1,6 @@
-package gcmserver.core;
+package gcmserver.controllers.model;
 
-public class Device {
+public class DeviceViewModel {
 
 	private String name;
 	private String registrationId;
@@ -8,23 +8,23 @@ public class Device {
 	/**
 	 * 
 	 */
-	public Device() {
+	public DeviceViewModel() {
 
 	}
 
 	/**
 	 * 
 	 */
-	public Device(Device device) {
-		this.name = new String(device.getName());
-		this.registrationId = new String(device.getRegistrationId());
+	public DeviceViewModel(DeviceViewModel deviceViewModel) {
+		this.name = new String(deviceViewModel.getName());
+		this.registrationId = new String(deviceViewModel.getRegistrationId());
 	}
 
 	/**
 	 * @param name
 	 * @param registrationId
 	 */
-	public Device(String name, String registrationId) {
+	public DeviceViewModel(String name, String registrationId) {
 		this.name = new String(name);
 		this.registrationId = new String(registrationId);
 	}
@@ -68,7 +68,7 @@ public class Device {
 	public boolean equals(Object objeto) {
 		// If the registrationId is the same, then it should be the same device
 		return this.registrationId
-				.equals(((Device) objeto).getRegistrationId());
+				.equals(((DeviceViewModel) objeto).getRegistrationId());
 	}
 
 	/*

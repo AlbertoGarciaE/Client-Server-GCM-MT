@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gcmserver.core;
+package gcmserver.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import gcmserver.model.Result;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

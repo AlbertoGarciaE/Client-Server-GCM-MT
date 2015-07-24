@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Devices>
+    <Device>
+        <Name>Will</Name>
+        <RegistrationId>0192824546</RegistrationId>
+    </Device>
+    <Device>
+        <Name>Bruce</Name>
+        <RegistrationId>0138542756</RegistrationId>
+    </Device>
+    <Device>
+        <Name>Julia</Name>
+        <RegistrationId>0138452168</RegistrationId>
+    </Device>
+    <Device>
+        <Name>Kate</Name>
+        <RegistrationId>0169485324</RegistrationId>
+    </Device>
+</Devices>

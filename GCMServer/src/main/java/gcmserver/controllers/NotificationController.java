@@ -1,13 +1,12 @@
-package gcmserver.controladores;
+package gcmserver.controllers;
 
+import gcmserver.controllers.model.Message;
 import gcmserver.core.Constants;
-import gcmserver.core.Device;
 import gcmserver.core.DeviceManager;
-import gcmserver.core.Message;
-import gcmserver.core.MulticastResult;
-import gcmserver.core.Result;
 import gcmserver.core.Sender;
-import gcmserver.persistence.Datastore;
+import gcmserver.model.Devices;
+import gcmserver.model.MulticastResult;
+import gcmserver.model.Result;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/Notification")
 public class NotificationController {
 
-	protected final Logger logger = LoggerFactory.getLogger(Sender.class);
+	private final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
 	private static final int MULTICAST_SIZE = 1000;
 
@@ -44,7 +43,7 @@ public class NotificationController {
 	private Message messageJsonMulti;
 	private Message messageXMPP;
 	private DeviceManager deviceMngr;
-	private List<Device> deviceList;
+	private List<Devices.Device> deviceList;
 
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
@@ -60,7 +59,7 @@ public class NotificationController {
 		messageJsonMulti = new Message();
 		messageXMPP = new Message();
 		deviceMngr = DeviceManager.getInstance();
-		deviceList = deviceMngr.getdeviceList();
+		deviceList = deviceMngr.getdeviceListSnapshot();
 		//TODO init list of regIds
 	}
 
@@ -70,7 +69,7 @@ public class NotificationController {
 		modelo.addAttribute("messageJson", messageJson);
 		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
 		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceList());
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}

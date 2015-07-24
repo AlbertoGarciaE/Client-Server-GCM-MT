@@ -1,6 +1,6 @@
 package gcmserver.controllers;
 
-import gcmserver.controllers.model.Message;
+import gcmserver.controllers.model.MessageViewModel;
 import gcmserver.core.Constants;
 import gcmserver.core.DeviceManager;
 import gcmserver.core.Sender;
@@ -33,20 +33,22 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/Notification")
 public class NotificationController {
 
-	private final Logger logger = LoggerFactory.getLogger(NotificationController.class);
+	private final Logger logger = LoggerFactory
+			.getLogger(NotificationController.class);
 
 	private static final int MULTICAST_SIZE = 1000;
 
 	private Sender sender;
-	private Message messagePlain;
-	private Message messageJson;
-	private Message messageJsonMulti;
-	private Message messageXMPP;
+	private MessageViewModel messagePlain;
+	private MessageViewModel messageJson;
+	private MessageViewModel messageJsonMulti;
+	private MessageViewModel messageXMPP;
 	private DeviceManager deviceMngr;
 	private List<Devices.Device> deviceList;
 
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
+	// API key obtained through the Google API Console.
 	@Value("${gcm.attributeAccesKey}")
 	private String attribute_acces_key;
 
@@ -54,13 +56,13 @@ public class NotificationController {
 	public void init() {
 
 		sender = new Sender(attribute_acces_key);
-		messagePlain = new Message();
-		messageJson = new Message();
-		messageJsonMulti = new Message();
-		messageXMPP = new Message();
+		messagePlain = new MessageViewModel();
+		messageJson = new MessageViewModel();
+		messageJsonMulti = new MessageViewModel();
+		messageXMPP = new MessageViewModel();
 		deviceMngr = DeviceManager.getInstance();
 		deviceList = deviceMngr.getdeviceListSnapshot();
-		//TODO init list of regIds
+		// TODO init list of regIds
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -78,34 +80,39 @@ public class NotificationController {
 	 * Send a message to a single target device via HTTP using plain text
 	 * 
 	 * @param regId
-	 * @param message
+	 * @param messageViewModel
 	 * @param sesion
 	 * @param modelo
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpPlain(
-			@ModelAttribute Message message, HttpSession sesion, Model modelo)
-			throws IOException {
+			@ModelAttribute MessageViewModel messageViewModel,
+			HttpSession sesion, Model modelo) throws IOException {
 		/*
-		 * TODO Send http plain text notification
+		 * Send http plain text notification
 		 */
 
-		String registrationId = message.getTarget();
+		String registrationId = messageViewModel.getTarget();
 		String status;
 		Result result = null;
 		if (registrationId.isEmpty()) {
 			status = "Message ignored as there is no target device id!";
 		} else {
 			// send a single message using plain post
-			result = this.sender.send(message, registrationId, 5);
-			status = "Sent message to one device: " + result;
+			result = this.sender.send(messageViewModel, registrationId, 5);
+			status = "Sent message to one device: " + result.toString();
 		}
 
-		// Logging the status to system log y web log
+		// Logging the status
 		logger.info(status);
-
-		modelo.addAttribute("message", message);
+		
+		modelo.addAttribute("messagePlain", messagePlain);
+		modelo.addAttribute("messageJson", messageJson);
+		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		modelo.addAttribute("messageXMPP", messageXMPP);
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
+		modelo.addAttribute("request", messageViewModel.toString());
 		modelo.addAttribute("response", result.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
@@ -121,8 +128,8 @@ public class NotificationController {
 	 */
 	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.GET)
 	protected ModelAndView notificationHttpJson(
-			@ModelAttribute Message messageSingleJSON, HttpSession sesion,
-			Model modelo) {
+			@ModelAttribute MessageViewModel messageSingleJSON,
+			HttpSession sesion, Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
@@ -132,8 +139,8 @@ public class NotificationController {
 		if (targetList.isEmpty()) {
 			status = "Message ignored as there is no target devices!";
 		} else {
-			
-			//TODO simplify the logic in order to no use the asynchsend()
+
+			// TODO simplify the logic in order to no use the asynchsend()
 			// send a multicast or single message using JSON
 			// NOTE: a real application
 			// could always send a multicast, even for just one recipient.
@@ -176,8 +183,8 @@ public class NotificationController {
 	 */
 	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.GET)
 	protected ModelAndView notificationHttpJsonMulti(
-			@ModelAttribute Message messageMultiJSON, HttpSession sesion,
-			Model modelo) {
+			@ModelAttribute MessageViewModel messageMultiJSON,
+			HttpSession sesion, Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
@@ -230,9 +237,10 @@ public class NotificationController {
 	 * Send asynchronously the message to the partial list of devices
 	 * 
 	 * @param partialTargets
-	 * @param message
+	 * @param messageViewModel
 	 */
-	private void asyncSend(List<String> partialTargets, final Message message) {
+	private void asyncSend(List<String> partialTargets,
+			final MessageViewModel messageViewModel) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialTargets);
 
@@ -242,7 +250,7 @@ public class NotificationController {
 
 				MulticastResult multicastResult;
 				try {
-					multicastResult = sender.send(message, devices, 5);
+					multicastResult = sender.send(messageViewModel, devices, 5);
 				} catch (IOException e) {
 					logger.error("Error posting messages", e);
 					return;
@@ -271,7 +279,7 @@ public class NotificationController {
 							// application has been removed from device -
 							// unregister it
 							logger.info("Unregistered device: " + regId);
-							//Datastore.unregister(regId);
+							// Datastore.unregister(regId);
 						} else {
 							logger.error("Error sending message to " + regId
 									+ ": " + error);

@@ -40,7 +40,7 @@ import static gcmserver.core.Constants.PARAM_TIME_TO_LIVE;
 import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
-import gcmserver.controllers.model.Message;
+import gcmserver.controllers.model.MessageViewModel;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
 import gcmserver.model.Result.Builder;
@@ -108,7 +108,7 @@ public class Sender {
 	 * case of service unavailability and hence could block the calling thread
 	 * for many seconds.
 	 *
-	 * @param message
+	 * @param messageViewModel
 	 *            message to be sent, including the device's registration id.
 	 * @param registrationId
 	 *            device where the message will be sent.
@@ -124,7 +124,7 @@ public class Sender {
 	 * @throws IOException
 	 *             if message could not be sent.
 	 */
-	public Result send(Message message, String registrationId, int retries)
+	public Result send(MessageViewModel messageViewModel, String registrationId, int retries)
 			throws IOException {
 		int attempt = 0;
 		Result result = null;
@@ -132,9 +132,9 @@ public class Sender {
 		boolean tryAgain;
 		do {
 			attempt++;
-			logger.info("Attempt #" + attempt + " to send message " + message
+			logger.info("Attempt #" + attempt + " to send message " + messageViewModel
 					+ " to regIds " + registrationId);
-			result = sendNoRetry(message, registrationId);
+			result = sendNoRetry(messageViewModel, registrationId);
 			tryAgain = result == null && attempt <= retries;
 			if (tryAgain) {
 				int sleepTime = backoff / 2 + random.nextInt(backoff);
@@ -153,7 +153,7 @@ public class Sender {
 
 	/**
 	 * Sends a message without retrying in case of service unavailability. See
-	 * {@link #send(Message, String, int)} for more info.
+	 * {@link #send(MessageViewModel, String, int)} for more info.
 	 *
 	 * @return result of the post, or {@literal null} if the GCM service was
 	 *         unavailable or any network exception caused the request to fail.
@@ -163,32 +163,32 @@ public class Sender {
 	 * @throws IllegalArgumentException
 	 *             if registrationId is {@literal null}.
 	 */
-	public Result sendNoRetry(Message message, String registrationId)
+	public Result sendNoRetry(MessageViewModel messageViewModel, String registrationId)
 			throws IOException {
 		StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
-		Boolean delayWhileIdle = message.getDelayWhileIdle();
+		Boolean delayWhileIdle = messageViewModel.getDelayWhileIdle();
 		if (delayWhileIdle != null) {
 			addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1"
 					: "0");
 		}
-		Boolean dryRun = message.getDryRun();
+		Boolean dryRun = messageViewModel.getDryRun();
 		if (dryRun != null) {
 			addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
 		}
-		String collapseKey = message.getCollapseKey();
+		String collapseKey = messageViewModel.getCollapseKey();
 		if (collapseKey != null) {
 			addParameter(body, PARAM_COLLAPSE_KEY, collapseKey);
 		}
-		String restrictedPackageName = message.getRestrictedPackageName();
+		String restrictedPackageName = messageViewModel.getRestrictedPackageName();
 		if (restrictedPackageName != null) {
 			addParameter(body, PARAM_RESTRICTED_PACKAGE_NAME,
 					restrictedPackageName);
 		}
-		Integer timeToLive = message.getTimeToLive();
+		Integer timeToLive = messageViewModel.getTimeToLive();
 		if (timeToLive != null) {
 			addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
 		}
-		for (Entry<String, String> entry : message.getData().entrySet()) {
+		for (Entry<String, String> entry : messageViewModel.getData().entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
 			if (key == null || value == null) {
@@ -199,7 +199,7 @@ public class Sender {
 			}
 		}
 		String requestBody = body.toString();
-		logger.info("Request body: " + requestBody);
+		logger.debug("Request body: " + requestBody);
 		HttpURLConnection conn;
 		int status;
 		try {
@@ -210,14 +210,14 @@ public class Sender {
 			return null;
 		}
 		if (status / 100 == 5) {
-			logger.info("GCM service is unavailable (status " + status + ")");
+			logger.warn("GCM service is unavailable (status " + status + ")");
 			return null;
 		}
 		String responseBody;
 		if (status != 200) {
 			try {
 				responseBody = getAndClose(conn.getErrorStream());
-				logger.info("Plain post error response: " + responseBody);
+				logger.error("Plain post error response: " + responseBody);
 			} catch (IOException e) {
 				// ignore the exception since it will thrown an
 				// InvalidRequestException
@@ -277,7 +277,7 @@ public class Sender {
 	 * case of service unavailability and hence could block the calling thread
 	 * for many seconds.
 	 *
-	 * @param message
+	 * @param messageViewModel
 	 *            message to be sent.
 	 * @param regIds
 	 *            registration id of the devices that will receive the message.
@@ -293,7 +293,7 @@ public class Sender {
 	 * @throws IOException
 	 *             if message could not be sent.
 	 */
-	public MulticastResult send(Message message, List<String> regIds,
+	public MulticastResult send(MessageViewModel messageViewModel, List<String> regIds,
 			int retries) throws IOException {
 		int attempt = 0;
 		MulticastResult multicastResult;
@@ -309,11 +309,11 @@ public class Sender {
 			multicastResult = null;
 			attempt++;
 
-			logger.info("Attempt #" + attempt + " to send message " + message
+			logger.info("Attempt #" + attempt + " to send message " + messageViewModel
 					+ " to regIds " + unsentRegIds);
 
 			try {
-				multicastResult = sendNoRetry(message, unsentRegIds);
+				multicastResult = sendNoRetry(messageViewModel, unsentRegIds);
 			} catch (IOException e) {
 				// no need for WARNING since exception might be already logged
 				logger.error("IOException on attempt " + attempt, e);
@@ -406,7 +406,7 @@ public class Sender {
 
 	/**
 	 * Sends a message without retrying in case of service unavailability. See
-	 * {@link #send(Message, List, int)} for more info.
+	 * {@link #send(MessageViewModel, List, int)} for more info.
 	 *
 	 * @return multicast results if the message was sent successfully,
 	 *         {@literal null} if it failed but could be retried.
@@ -418,7 +418,7 @@ public class Sender {
 	 * @throws IOException
 	 *             if there was a JSON parsing error
 	 */
-	public MulticastResult sendNoRetry(Message message,
+	public MulticastResult sendNoRetry(MessageViewModel messageViewModel,
 			List<String> registrationIds) throws IOException {
 		if (nonNull(registrationIds).isEmpty()) {
 			throw new IllegalArgumentException(
@@ -426,18 +426,18 @@ public class Sender {
 		}
 		Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
 		// Set the options field fields
-		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
-		setJsonField(jsonRequest, JSON_PRIORITY, message.getPriority());
+		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, messageViewModel.getCollapseKey());
+		setJsonField(jsonRequest, JSON_PRIORITY, messageViewModel.getPriority());
 		setJsonField(jsonRequest, JSON_CONTENT_AVAILABLE,
-				message.getContentAvailable());
+				messageViewModel.getContentAvailable());
 		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
-				message.getDelayWhileIdle());
-		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+				messageViewModel.getDelayWhileIdle());
+		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, messageViewModel.getTimeToLive());
 		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
-				message.getDeliveryReceiptRequested());
+				messageViewModel.getDeliveryReceiptRequested());
 		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
-				message.getRestrictedPackageName());
-		setJsonField(jsonRequest, PARAM_DRY_RUN, message.getDryRun());
+				messageViewModel.getRestrictedPackageName());
+		setJsonField(jsonRequest, PARAM_DRY_RUN, messageViewModel.getDryRun());
 		// Set the target or targets of the message
 		if (registrationIds.size() > 1) {
 			// Is a multicast message, we should use the field
@@ -447,11 +447,11 @@ public class Sender {
 			// Is a single message, we should use the field JSON_TO
 			jsonRequest.put(JSON_TO, registrationIds);
 		}
-		Map<String, String> payload_data = message.getData();
+		Map<String, String> payload_data = messageViewModel.getData();
 		if (!payload_data.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_DATA, payload_data);
 		}
-		Map<String, String> payload_notification = message.getNotification();
+		Map<String, String> payload_notification = messageViewModel.getNotification();
 		if (!payload_notification.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_NOTIFICATION, payload_notification);
 		}

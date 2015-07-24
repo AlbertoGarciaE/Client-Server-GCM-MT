@@ -15,8 +15,6 @@
  */
 package gcmserver.model;
 
-import gcmserver.core.Sender;
-
 import java.io.InputStream;
 import java.io.PrintWriter;
 
@@ -31,7 +29,8 @@ import javax.xml.bind.Marshaller;
  */
 public final class Datastore {
 
-	private final static Logger logger = LoggerFactory.getLogger(Datastore.class);
+	private final static Logger logger = LoggerFactory
+			.getLogger(Datastore.class);
 	// Context is the name of package
 	private final static String context = "gcmserver.model";
 
@@ -49,11 +48,10 @@ public final class Datastore {
 			// Create an instance of JAXB Context
 			JAXBContext jContext = JAXBContext.newInstance(context);
 
-			logger.info("Unmarshalling XML file");
+			logger.debug("Unmarshalling XML file");
 			// Unmarshal the data from InputStream
 			obj = jContext.createUnmarshaller().unmarshal(is);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			logger.error("Unmarshalling from XML file failed: " + e.toString());
 			e.printStackTrace();
 		}
@@ -64,18 +62,17 @@ public final class Datastore {
 	public static void marshalXML(PrintWriter out, Object object) {
 
 		try {
-			// Initialise JAXB Context
+			// Initialize JAXB Context
 			JAXBContext jc = JAXBContext.newInstance(context);
 
-			// Now Create JAXB XML Marshallar
+			// Now Create JAXB XML Marshaler
 			Marshaller m = jc.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-			logger.info("Marshalling to XML file");
+			logger.debug("Marshalling to XML file");
 			// Write the XML File
 			m.marshal((Devices) object, out);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			logger.error("Marshalling to XML file failed: " + e.toString());
 			e.printStackTrace();
 		}

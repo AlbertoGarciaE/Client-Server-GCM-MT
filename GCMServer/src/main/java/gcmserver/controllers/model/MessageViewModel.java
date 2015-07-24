@@ -24,7 +24,7 @@ import java.util.Map;
  * GCM message.
  *
  */
-public final class Message implements Serializable {
+public final class MessageViewModel implements Serializable {
 	private String target;
 	private List<String> listTargets;
 	// optional parameters
@@ -40,7 +40,7 @@ public final class Message implements Serializable {
 	private final Map<String, String> data;
 	private final Map<String, String> notification;
 
-	public Message() {
+	public MessageViewModel() {
 		this.data = new LinkedHashMap<String, String>();
 		this.notification = new LinkedHashMap<String, String>();
 	}

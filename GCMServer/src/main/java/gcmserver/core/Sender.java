@@ -41,6 +41,7 @@ import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
 import gcmserver.controllers.model.MessageViewModel;
+import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
 import gcmserver.model.Result.Builder;
@@ -89,7 +90,8 @@ public class Sender {
 			.getLogger(Sender.class);
 
 	private final String key;
-//TODO add group message functions
+
+	// TODO add group message functions
 	/**
 	 * Default constructor.
 	 *
@@ -108,7 +110,7 @@ public class Sender {
 	 * case of service unavailability and hence could block the calling thread
 	 * for many seconds.
 	 *
-	 * @param messageViewModel
+	 * @param message
 	 *            message to be sent, including the device's registration id.
 	 * @param registrationId
 	 *            device where the message will be sent.
@@ -124,17 +126,20 @@ public class Sender {
 	 * @throws IOException
 	 *             if message could not be sent.
 	 */
-	public Result send(MessageViewModel messageViewModel, String registrationId, int retries)
-			throws IOException {
+	/*
+	 * Implements the exponential backoff retry and the result interpretation
+	 */
+	public Result sendHttpPlainText(Message message, String registrationId,
+			int retries) throws IOException {
 		int attempt = 0;
 		Result result = null;
 		int backoff = BACKOFF_INITIAL_DELAY;
 		boolean tryAgain;
 		do {
 			attempt++;
-			logger.info("Attempt #" + attempt + " to send message " + messageViewModel
+			logger.info("Attempt #" + attempt + " to send message " + message
 					+ " to regIds " + registrationId);
-			result = sendNoRetry(messageViewModel, registrationId);
+			result = sendNoRetryHttpPlainText(message, registrationId);
 			tryAgain = result == null && attempt <= retries;
 			if (tryAgain) {
 				int sleepTime = backoff / 2 + random.nextInt(backoff);
@@ -153,7 +158,7 @@ public class Sender {
 
 	/**
 	 * Sends a message without retrying in case of service unavailability. See
-	 * {@link #send(MessageViewModel, String, int)} for more info.
+	 * {@link #sendPlainText(MessageViewModel, String, int)} for more info.
 	 *
 	 * @return result of the post, or {@literal null} if the GCM service was
 	 *         unavailable or any network exception caused the request to fail.
@@ -163,39 +168,28 @@ public class Sender {
 	 * @throws IllegalArgumentException
 	 *             if registrationId is {@literal null}.
 	 */
-	public Result sendNoRetry(MessageViewModel messageViewModel, String registrationId)
-			throws IOException {
+	/*
+	 * Implements the message send process using HTTP plain text
+	 */
+	public Result sendNoRetryHttpPlainText(Message message,
+			String registrationId) throws IOException {
 		StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
-		Boolean delayWhileIdle = messageViewModel.getDelayWhileIdle();
-		if (delayWhileIdle != null) {
-			addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1"
-					: "0");
-		}
-		Boolean dryRun = messageViewModel.getDryRun();
-		if (dryRun != null) {
-			addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
-		}
-		String collapseKey = messageViewModel.getCollapseKey();
-		if (collapseKey != null) {
-			addParameter(body, PARAM_COLLAPSE_KEY, collapseKey);
-		}
-		String restrictedPackageName = messageViewModel.getRestrictedPackageName();
-		if (restrictedPackageName != null) {
-			addParameter(body, PARAM_RESTRICTED_PACKAGE_NAME,
-					restrictedPackageName);
-		}
-		Integer timeToLive = messageViewModel.getTimeToLive();
-		if (timeToLive != null) {
-			addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
-		}
-		for (Entry<String, String> entry : messageViewModel.getData().entrySet()) {
+		addOptParameter(body, PARAM_DELAY_WHILE_IDLE,
+				message.isDelayWhileIdle());
+		addOptParameter(body, PARAM_DRY_RUN, message.isDryRun());
+		addOptParameter(body, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+		addOptParameter(body, PARAM_RESTRICTED_PACKAGE_NAME,
+				message.getRestrictedPackageName());
+		addOptParameter(body, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+
+		for (Entry<String, String> entry : message.getData().entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			if (key == null || value == null) {
+			if (key == null) {
 				logger.warn("Ignoring payload entry thas has null: " + entry);
 			} else {
 				key = PARAM_PAYLOAD_PREFIX + key;
-				addParameter(body, key, URLEncoder.encode(value, UTF8));
+				addOptParameter(body, key, URLEncoder.encode(value, UTF8));
 			}
 		}
 		String requestBody = body.toString();
@@ -293,8 +287,8 @@ public class Sender {
 	 * @throws IOException
 	 *             if message could not be sent.
 	 */
-	public MulticastResult send(MessageViewModel messageViewModel, List<String> regIds,
-			int retries) throws IOException {
+	public MulticastResult sendHttpJson(MessageViewModel messageViewModel,
+			List<String> regIds, int retries) throws IOException {
 		int attempt = 0;
 		MulticastResult multicastResult;
 		int backoff = BACKOFF_INITIAL_DELAY;
@@ -309,11 +303,12 @@ public class Sender {
 			multicastResult = null;
 			attempt++;
 
-			logger.info("Attempt #" + attempt + " to send message " + messageViewModel
-					+ " to regIds " + unsentRegIds);
+			logger.info("Attempt #" + attempt + " to send message "
+					+ messageViewModel + " to regIds " + unsentRegIds);
 
 			try {
-				multicastResult = sendNoRetry(messageViewModel, unsentRegIds);
+				multicastResult = sendNoRetryHttpJson(messageViewModel,
+						unsentRegIds);
 			} catch (IOException e) {
 				// no need for WARNING since exception might be already logged
 				logger.error("IOException on attempt " + attempt, e);
@@ -406,7 +401,7 @@ public class Sender {
 
 	/**
 	 * Sends a message without retrying in case of service unavailability. See
-	 * {@link #send(MessageViewModel, List, int)} for more info.
+	 * {@link #sendHttpJson(MessageViewModel, List, int)} for more info.
 	 *
 	 * @return multicast results if the message was sent successfully,
 	 *         {@literal null} if it failed but could be retried.
@@ -418,21 +413,24 @@ public class Sender {
 	 * @throws IOException
 	 *             if there was a JSON parsing error
 	 */
-	public MulticastResult sendNoRetry(MessageViewModel messageViewModel,
-			List<String> registrationIds) throws IOException {
+	public MulticastResult sendNoRetryHttpJson(
+			MessageViewModel messageViewModel, List<String> registrationIds)
+			throws IOException {
 		if (nonNull(registrationIds).isEmpty()) {
 			throw new IllegalArgumentException(
 					"Field RegistrationIds/To cannot be empty");
 		}
 		Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
 		// Set the options field fields
-		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, messageViewModel.getCollapseKey());
+		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY,
+				messageViewModel.getCollapseKey());
 		setJsonField(jsonRequest, JSON_PRIORITY, messageViewModel.getPriority());
 		setJsonField(jsonRequest, JSON_CONTENT_AVAILABLE,
 				messageViewModel.getContentAvailable());
 		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
 				messageViewModel.getDelayWhileIdle());
-		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, messageViewModel.getTimeToLive());
+		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE,
+				messageViewModel.getTimeToLive());
 		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
 				messageViewModel.getDeliveryReceiptRequested());
 		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
@@ -451,7 +449,8 @@ public class Sender {
 		if (!payload_data.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_DATA, payload_data);
 		}
-		Map<String, String> payload_notification = messageViewModel.getNotification();
+		Map<String, String> payload_notification = messageViewModel
+				.getNotification();
 		if (!payload_notification.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_NOTIFICATION, payload_notification);
 		}
@@ -548,11 +547,18 @@ public class Sender {
 	}
 
 	/**
-	 * Sets a JSON field, but only if the value is not {@literal null}.
+	 * Sets a JSON field, but only if the value is not {@literal null} or is and
+	 * empty {@link String}.
 	 */
 	private void setJsonField(Map<Object, Object> json, String field,
 			Object value) {
 		if (value != null) {
+			if (value instanceof String) {
+				if (((String) value).isEmpty()) {
+					// Do not put a empty string as message field
+					return;
+				}
+			}
 			json.put(field, value);
 		}
 	}
@@ -667,7 +673,9 @@ public class Sender {
 	}
 
 	/**
-	 * Adds a new parameter to the HTTP POST body.
+	 * Adds a new parameter to the HTTP POST body only if is not {@literal null}
+	 * or empty {@link String}. {@link Boolean} values are formated as a
+	 * character 1 or 0
 	 *
 	 * @param body
 	 *            HTTP POST body.
@@ -676,10 +684,20 @@ public class Sender {
 	 * @param value
 	 *            parameter's value.
 	 */
-	protected static void addParameter(StringBuilder body, String name,
-			String value) {
-		nonNull(body).append('&').append(nonNull(name)).append('=')
-				.append(nonNull(value));
+	private static void addOptParameter(StringBuilder body, String name,
+			Object value) {
+		if (value != null) {
+			String encodedValue = value.toString();
+			if (value instanceof Boolean) {
+				encodedValue = ((Boolean) value) ? "1" : "0";
+			}
+			if (value instanceof String && ((String) value).isEmpty()) {
+				// Do not add and empty string for parameter
+				return;
+			}
+			nonNull(body).append('&').append(nonNull(name)).append('=')
+					.append(nonNull(encodedValue));
+		}
 	}
 
 	/**

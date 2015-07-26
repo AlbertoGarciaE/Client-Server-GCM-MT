@@ -5,6 +5,7 @@ import gcmserver.core.Constants;
 import gcmserver.core.DeviceManager;
 import gcmserver.core.Sender;
 import gcmserver.model.Devices;
+import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
 
@@ -44,8 +45,6 @@ public class NotificationController {
 	private MessageViewModel messageJsonMulti;
 	private MessageViewModel messageXMPP;
 	private DeviceManager deviceMngr;
-	private List<Devices.Device> deviceList;
-
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
 	// API key obtained through the Google API Console.
@@ -61,8 +60,6 @@ public class NotificationController {
 		messageJsonMulti = new MessageViewModel();
 		messageXMPP = new MessageViewModel();
 		deviceMngr = DeviceManager.getInstance();
-		deviceList = deviceMngr.getdeviceListSnapshot();
-		// TODO init list of regIds
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -72,6 +69,8 @@ public class NotificationController {
 		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
 		modelo.addAttribute("messageXMPP", messageXMPP);
 		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
+		modelo.addAttribute("request", "");
+		modelo.addAttribute("response", "");
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
@@ -80,39 +79,68 @@ public class NotificationController {
 	 * Send a message to a single target device via HTTP using plain text
 	 * 
 	 * @param regId
-	 * @param messageViewModel
+	 * @param message
 	 * @param sesion
 	 * @param modelo
 	 * @throws IOException
 	 */
 	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpPlain(
-			@ModelAttribute MessageViewModel messageViewModel,
+			@ModelAttribute MessageViewModel message,
 			HttpSession sesion, Model modelo) throws IOException {
 		/*
 		 * Send http plain text notification
 		 */
 
-		String registrationId = messageViewModel.getTarget();
+		String registrationId = message.getTarget();
 		String status;
 		Result result = null;
 		if (registrationId.isEmpty()) {
 			status = "Message ignored as there is no target device id!";
 		} else {
+			final Message.Builder messageBuilder = new Message.Builder();
+			String collapseKey = message.getCollapseKey();
+			if (!collapseKey.isEmpty()) {
+				messageBuilder.collapseKey(collapseKey.trim());
+			}
+			String restrictedPackageName = message
+					.getRestrictedPackageName();
+			if (!restrictedPackageName.isEmpty()) {
+				messageBuilder.restrictedPackageName(restrictedPackageName
+						.trim());
+			}
+			Integer timeToLive = message.getTimeToLive();
+			if (timeToLive != null) {
+				messageBuilder.timeToLive(timeToLive);
+			}
+
+			// Boolean
+			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
+			// Boolean
+			messageBuilder.dryRun(message.getDryRun());
+			// TODO add the data to message
+			/*
+			 * EditableMapView data = (EditableMapView) activity
+			 * .findViewById(R.id.downstream_data); for
+			 * (EditableMapView.MapEntry mapEntry : data.getMapEntries()) { if
+			 * (isNotEmpty(mapEntry.key) && isNotEmpty(mapEntry.value)) {
+			 * messageBuilder.addData(mapEntry.key, mapEntry.value); } }
+			 */
 			// send a single message using plain post
-			result = this.sender.send(messageViewModel, registrationId, 5);
+			result = this.sender.sendHttpPlainText(messageBuilder.build(),
+					registrationId, 5);
 			status = "Sent message to one device: " + result.toString();
 		}
 
 		// Logging the status
 		logger.info(status);
-		
+
 		modelo.addAttribute("messagePlain", messagePlain);
 		modelo.addAttribute("messageJson", messageJson);
 		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
 		modelo.addAttribute("messageXMPP", messageXMPP);
 		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("request", messageViewModel.toString());
+		modelo.addAttribute("request", message.toString());
 		modelo.addAttribute("response", result.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
@@ -122,52 +150,77 @@ public class NotificationController {
 	 * Send a message to a single target via HTTP using JSON
 	 * 
 	 * @param targets
-	 * @param messageSingleJSON
+	 * @param message
 	 * @param sesion
 	 * @param modelo
 	 */
 	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.GET)
 	protected ModelAndView notificationHttpJson(
-			@ModelAttribute MessageViewModel messageSingleJSON,
+			@ModelAttribute MessageViewModel message,
 			HttpSession sesion, Model modelo) {
-		/*
-		 * TODO Send http JSON notification
-		 */
-		List<String> targetList = new ArrayList<String>();
-		targetList.add(messageSingleJSON.getTarget());
+
+		// Send single http JSON notification
+		// NOTE: a real application
+		// could always send a multicast, even for just one recipient.
+		// Thus if we want to send a single message we pass one device only
+		// The targetList will contain only 1 target since is a single JSON
+		// message
+
+		List<String> targetList = new ArrayList<String>(1);
+		targetList.add(message.getTarget());
 		String status;
 		if (targetList.isEmpty()) {
 			status = "Message ignored as there is no target devices!";
 		} else {
+			MulticastResult multicastResult;
+			try {
+				multicastResult = sender.sendHttpJson(message,
+						targetList, 5);
+				List<Result> results = multicastResult.getResults();
+				// analyze the results
 
-			// TODO simplify the logic in order to no use the asynchsend()
-			// send a multicast or single message using JSON
-			// NOTE: a real application
-			// could always send a multicast, even for just one recipient.
-			// Thus if we want to send a single message we pass one device only
-			// If we are sending a multicast message using JSON
-			// we must split in chunks of 1000 devices due to GCM limit
-
-			int total = targetList.size();
-			List<String> partialTargets = new ArrayList<String>(total);
-			int counter = 0;
-			int tasks = 0;
-			for (String target : targetList) {
-				counter++;
-				partialTargets.add(target);
-				int partialSize = partialTargets.size();
-				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialTargets, messageSingleJSON);
-					partialTargets.clear();
-					tasks++;
+				String regId = targetList.get(0);
+				Result result = results.get(0);
+				String messageId = result.getMessageId();
+				if (messageId != null) {
+					logger.info("Succesfully sent message to device: " + regId
+							+ "; messageId = " + messageId);
+					String canonicalRegId = result.getCanonicalRegistrationId();
+					if (canonicalRegId != null) {
+						// same device has more than on registration id:
+						// update it
+						logger.info("Found canonicalRegId " + canonicalRegId);
+						deviceMngr.updateRegistration(regId, canonicalRegId);
+					}
+				} else {
+					String error = result.getErrorCodeName();
+					if (error.equals(Constants.ERROR_NOT_REGISTERED)) {
+						// application has been removed from device -
+						// unregister it
+						logger.info("Unregistered device: " + regId);
+						// Datastore.unregister(regId);
+					} else {
+						logger.error("Error sending message to " + regId + ": "
+								+ error);
+					}
 				}
+
+			} catch (IOException e) {
+				logger.error("Error posting messages", e);
 			}
-			status = "Asynchronously sending " + tasks
-					+ " multicast messages to " + total + " devices";
+
 		}
+
+		status = "Message sent to device";
+
 		logger.info(status);
-		// TODO recuperar la multiastResponse
-		modelo.addAttribute("message", messageSingleJSON);
+
+		modelo.addAttribute("messagePlain", messagePlain);
+		modelo.addAttribute("messageJson", messageJson);
+		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		modelo.addAttribute("messageXMPP", messageXMPP);
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("request", request.toString());
 		// modelo.addAttribute("response", result.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
@@ -177,18 +230,18 @@ public class NotificationController {
 	 * Send a message to multiples targets via HTTP using JSON
 	 * 
 	 * @param targets
-	 * @param messageMultiJSON
+	 * @param message
 	 * @param sesion
 	 * @param modelo
 	 */
 	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.GET)
 	protected ModelAndView notificationHttpJsonMulti(
-			@ModelAttribute MessageViewModel messageMultiJSON,
+			@ModelAttribute MessageViewModel message,
 			HttpSession sesion, Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
-		List<String> targetList = messageMultiJSON.getListTargets();
+		List<String> targetList = message.getListTargets();
 		String status;
 		if (targetList.isEmpty()) {
 			status = "Message ignored as there is no target devices!";
@@ -209,7 +262,7 @@ public class NotificationController {
 				partialTargets.add(target);
 				int partialSize = partialTargets.size();
 				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialTargets, messageMultiJSON);
+					asyncSend(partialTargets, message);
 					partialTargets.clear();
 					tasks++;
 				}
@@ -219,7 +272,7 @@ public class NotificationController {
 		}
 		logger.info(status);
 		// TODO recuperar la multiastResponse
-		modelo.addAttribute("message", messageMultiJSON);
+		modelo.addAttribute("message", message);
 		// modelo.addAttribute("response", result.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
@@ -237,10 +290,10 @@ public class NotificationController {
 	 * Send asynchronously the message to the partial list of devices
 	 * 
 	 * @param partialTargets
-	 * @param messageViewModel
+	 * @param message
 	 */
 	private void asyncSend(List<String> partialTargets,
-			final MessageViewModel messageViewModel) {
+			final MessageViewModel message) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialTargets);
 
@@ -250,7 +303,8 @@ public class NotificationController {
 
 				MulticastResult multicastResult;
 				try {
-					multicastResult = sender.send(messageViewModel, devices, 5);
+					multicastResult = sender.sendHttpJson(message,
+							devices, 5);
 				} catch (IOException e) {
 					logger.error("Error posting messages", e);
 					return;

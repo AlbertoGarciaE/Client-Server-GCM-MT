@@ -53,7 +53,8 @@ public final class MessageViewModel implements Serializable {
 	}
 
 	/**
-	 * @param target the target to set
+	 * @param target
+	 *            the target to set
 	 */
 	public void setTarget(String target) {
 		this.target = target;
@@ -192,10 +193,29 @@ public final class MessageViewModel implements Serializable {
 	public Map<String, String> getNotification() {
 		return notification;
 	}
-//TODO add target a el metodo to string
+
+	/**
+	 * @return the listTargets
+	 */
+	public List<String> getListTargets() {
+		return listTargets;
+	}
+
+	/**
+	 * @param listTargets
+	 *            the listTargets to set
+	 */
+	public void setListTargets(List<String> listTargets) {
+		this.listTargets = listTargets;
+	}
+
+	// TODO add target a el metodo to string
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Message(");
+		if (target != null) {
+			builder.append("target=").append(target).append(", ");
+		}
 		if (collapseKey != null) {
 			builder.append("collapseKey=").append(collapseKey).append(", ");
 		}
@@ -248,19 +268,4 @@ public final class MessageViewModel implements Serializable {
 		builder.append(")");
 		return builder.toString();
 	}
-
-	/**
-	 * @return the listTargets
-	 */
-	public List<String> getListTargets() {
-		return listTargets;
-	}
-
-	/**
-	 * @param listTargets the listTargets to set
-	 */
-	public void setListTargets(List<String> listTargets) {
-		this.listTargets = listTargets;
-	}
-
 }

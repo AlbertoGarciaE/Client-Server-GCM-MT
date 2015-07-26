@@ -536,14 +536,14 @@
 						<h2>Request</h2>
 						<p>Final request sent to GCM server</p>
 						<textarea class="form-control" rows="20" id="input_request"
-							readonly="">aaaaaa</textarea>
+							readonly="" th:text="${modelo.request}">The Request</textarea>
 					</div>
 					<div role="tabpanel" class="tab-pane" id="response">
 						<h2>Response</h2>
 						<p>Response received from the server after delivery our
 							notifications</p>
 						<textarea class="form-control" rows="20" id="input_response"
-							readonly="">aaaaa</textarea>
+							readonly="" th:text="${modelo.response}">The Response</textarea>
 					</div>
 				</div>
 			</div>

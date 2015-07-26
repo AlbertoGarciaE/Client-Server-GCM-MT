@@ -254,14 +254,14 @@ public final class Message implements Serializable {
 	/**
 	 * Get the contentAvailable
 	 */
-	public Boolean getContentAvailable() {
+	public Boolean isContentAvailable() {
 		return contentAvailable;
 	}
 
 	/**
 	 * Get the deliveryReceiptRequested
 	 */
-	public Boolean getDeliveryReceiptRequested() {
+	public Boolean isDeliveryReceiptRequested() {
 		return deliveryReceiptRequested;
 	}
 

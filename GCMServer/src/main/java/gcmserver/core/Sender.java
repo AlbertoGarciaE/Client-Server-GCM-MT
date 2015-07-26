@@ -271,7 +271,7 @@ public class Sender {
 	 * case of service unavailability and hence could block the calling thread
 	 * for many seconds.
 	 *
-	 * @param messageViewModel
+	 * @param message
 	 *            message to be sent.
 	 * @param regIds
 	 *            registration id of the devices that will receive the message.
@@ -287,7 +287,7 @@ public class Sender {
 	 * @throws IOException
 	 *             if message could not be sent.
 	 */
-	public MulticastResult sendHttpJson(MessageViewModel messageViewModel,
+	public MulticastResult sendHttpJson(Message message,
 			List<String> regIds, int retries) throws IOException {
 		int attempt = 0;
 		MulticastResult multicastResult;
@@ -304,10 +304,10 @@ public class Sender {
 			attempt++;
 
 			logger.info("Attempt #" + attempt + " to send message "
-					+ messageViewModel + " to regIds " + unsentRegIds);
+					+ message + " to regIds " + unsentRegIds);
 
 			try {
-				multicastResult = sendNoRetryHttpJson(messageViewModel,
+				multicastResult = sendNoRetryHttpJson(message,
 						unsentRegIds);
 			} catch (IOException e) {
 				// no need for WARNING since exception might be already logged
@@ -414,7 +414,7 @@ public class Sender {
 	 *             if there was a JSON parsing error
 	 */
 	public MulticastResult sendNoRetryHttpJson(
-			MessageViewModel messageViewModel, List<String> registrationIds)
+			Message message, List<String> registrationIds)
 			throws IOException {
 		if (nonNull(registrationIds).isEmpty()) {
 			throw new IllegalArgumentException(
@@ -423,19 +423,19 @@ public class Sender {
 		Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
 		// Set the options field fields
 		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY,
-				messageViewModel.getCollapseKey());
-		setJsonField(jsonRequest, JSON_PRIORITY, messageViewModel.getPriority());
+				message.getCollapseKey());
+		setJsonField(jsonRequest, JSON_PRIORITY, message.getPriority());
 		setJsonField(jsonRequest, JSON_CONTENT_AVAILABLE,
-				messageViewModel.getContentAvailable());
+				message.isContentAvailable());
 		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
-				messageViewModel.getDelayWhileIdle());
+				message.isDelayWhileIdle());
 		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE,
-				messageViewModel.getTimeToLive());
+				message.getTimeToLive());
 		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
-				messageViewModel.getDeliveryReceiptRequested());
+				message.isDeliveryReceiptRequested());
 		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
-				messageViewModel.getRestrictedPackageName());
-		setJsonField(jsonRequest, PARAM_DRY_RUN, messageViewModel.getDryRun());
+				message.getRestrictedPackageName());
+		setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
 		// Set the target or targets of the message
 		if (registrationIds.size() > 1) {
 			// Is a multicast message, we should use the field
@@ -443,13 +443,13 @@ public class Sender {
 			jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
 		} else {
 			// Is a single message, we should use the field JSON_TO
-			jsonRequest.put(JSON_TO, registrationIds);
+			jsonRequest.put(JSON_TO, registrationIds.get(0));
 		}
-		Map<String, String> payload_data = messageViewModel.getData();
+		Map<String, String> payload_data = message.getData();
 		if (!payload_data.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_DATA, payload_data);
 		}
-		Map<String, String> payload_notification = messageViewModel
+		Map<String, String> payload_notification = message
 				.getNotification();
 		if (!payload_notification.isEmpty()) {
 			jsonRequest.put(JSON_PAYLOAD_NOTIFICATION, payload_notification);

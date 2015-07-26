@@ -86,8 +86,8 @@ public class NotificationController {
 	 */
 	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpPlain(
-			@ModelAttribute MessageViewModel message,
-			HttpSession sesion, Model modelo) throws IOException {
+			@ModelAttribute MessageViewModel message, HttpSession sesion,
+			Model modelo) throws IOException {
 		/*
 		 * Send http plain text notification
 		 */
@@ -103,8 +103,7 @@ public class NotificationController {
 			if (!collapseKey.isEmpty()) {
 				messageBuilder.collapseKey(collapseKey.trim());
 			}
-			String restrictedPackageName = message
-					.getRestrictedPackageName();
+			String restrictedPackageName = message.getRestrictedPackageName();
 			if (!restrictedPackageName.isEmpty()) {
 				messageBuilder.restrictedPackageName(restrictedPackageName
 						.trim());
@@ -154,10 +153,10 @@ public class NotificationController {
 	 * @param sesion
 	 * @param modelo
 	 */
-	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.GET)
+	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpJson(
-			@ModelAttribute MessageViewModel message,
-			HttpSession sesion, Model modelo) {
+			@ModelAttribute MessageViewModel message, HttpSession sesion,
+			Model modelo) {
 
 		// Send single http JSON notification
 		// NOTE: a real application
@@ -169,13 +168,37 @@ public class NotificationController {
 		List<String> targetList = new ArrayList<String>(1);
 		targetList.add(message.getTarget());
 		String status;
+		MulticastResult multicastResult = null;
 		if (targetList.isEmpty()) {
 			status = "Message ignored as there is no target devices!";
 		} else {
-			MulticastResult multicastResult;
+			final Message.Builder messageBuilder = new Message.Builder();
+			String collapseKey = message.getCollapseKey();
+			if (!collapseKey.isEmpty()) {
+				messageBuilder.collapseKey(collapseKey.trim());
+			}
+			String restrictedPackageName = message.getRestrictedPackageName();
+			if (!restrictedPackageName.isEmpty()) {
+				messageBuilder.restrictedPackageName(restrictedPackageName
+						.trim());
+			}
+			Integer timeToLive = message.getTimeToLive();
+			if (timeToLive != null) {
+				messageBuilder.timeToLive(timeToLive);
+			}
+			Integer prority = message.getPriority();
+			if (prority != null) {
+				messageBuilder.priority(prority);
+			}
+			// Boolean
+			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
+			// Boolean
+			messageBuilder.dryRun(message.getDryRun());
+			// Boolean
+			messageBuilder.contentAvailable(message.getContentAvailable());
+
 			try {
-				multicastResult = sender.sendHttpJson(message,
-						targetList, 5);
+				multicastResult = sender.sendHttpJson(messageBuilder.build(), targetList, 5);
 				List<Result> results = multicastResult.getResults();
 				// analyze the results
 
@@ -220,8 +243,8 @@ public class NotificationController {
 		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
 		modelo.addAttribute("messageXMPP", messageXMPP);
 		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		// modelo.addAttribute("request", request.toString());
-		// modelo.addAttribute("response", result.toString());
+		modelo.addAttribute("request", message.toString());
+		modelo.addAttribute("response", multicastResult.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
@@ -234,10 +257,10 @@ public class NotificationController {
 	 * @param sesion
 	 * @param modelo
 	 */
-	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.GET)
+	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpJsonMulti(
-			@ModelAttribute MessageViewModel message,
-			HttpSession sesion, Model modelo) {
+			@ModelAttribute MessageViewModel message, HttpSession sesion,
+			Model modelo) {
 		/*
 		 * TODO Send http JSON notification
 		 */
@@ -253,6 +276,32 @@ public class NotificationController {
 			// If we are sending a multicast message using JSON
 			// we must split in chunks of 1000 devices due to GCM limit
 
+			//Build message
+			final Message.Builder messageBuilder = new Message.Builder();
+			String collapseKey = message.getCollapseKey();
+			if (!collapseKey.isEmpty()) {
+				messageBuilder.collapseKey(collapseKey.trim());
+			}
+			String restrictedPackageName = message.getRestrictedPackageName();
+			if (!restrictedPackageName.isEmpty()) {
+				messageBuilder.restrictedPackageName(restrictedPackageName
+						.trim());
+			}
+			Integer timeToLive = message.getTimeToLive();
+			if (timeToLive != null) {
+				messageBuilder.timeToLive(timeToLive);
+			}
+			Integer prority = message.getPriority();
+			if (prority != null) {
+				messageBuilder.priority(prority);
+			}
+			// Boolean
+			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
+			// Boolean
+			messageBuilder.dryRun(message.getDryRun());
+			// Boolean
+			messageBuilder.contentAvailable(message.getContentAvailable());
+
 			int total = targetList.size();
 			List<String> partialTargets = new ArrayList<String>(total);
 			int counter = 0;
@@ -262,7 +311,7 @@ public class NotificationController {
 				partialTargets.add(target);
 				int partialSize = partialTargets.size();
 				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialTargets, message);
+					asyncSend(partialTargets, messageBuilder.build());
 					partialTargets.clear();
 					tasks++;
 				}
@@ -278,7 +327,7 @@ public class NotificationController {
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
 
-	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.GET)
+	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.POST)
 	protected void notificationXMPP(@RequestParam String regId,
 			HttpSession sesion, Model modelo) {
 		/*
@@ -293,7 +342,7 @@ public class NotificationController {
 	 * @param message
 	 */
 	private void asyncSend(List<String> partialTargets,
-			final MessageViewModel message) {
+			final Message message) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialTargets);
 
@@ -303,8 +352,7 @@ public class NotificationController {
 
 				MulticastResult multicastResult;
 				try {
-					multicastResult = sender.sendHttpJson(message,
-							devices, 5);
+					multicastResult = sender.sendHttpJson(message, devices, 5);
 				} catch (IOException e) {
 					logger.error("Error posting messages", e);
 					return;

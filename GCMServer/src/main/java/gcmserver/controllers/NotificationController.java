@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Controller
 @RequestMapping("/Notification")
 public class NotificationController {
@@ -114,18 +117,33 @@ public class NotificationController {
 				messageBuilder.timeToLive(timeToLive);
 			}
 
-			// Boolean
-			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
-			// Boolean
-			messageBuilder.dryRun(message.getDryRun());
-			// TODO add the data to message
-			/*
-			 * EditableMapView data = (EditableMapView) activity
-			 * .findViewById(R.id.downstream_data); for
-			 * (EditableMapView.MapEntry mapEntry : data.getMapEntries()) { if
-			 * (isNotEmpty(mapEntry.key) && isNotEmpty(mapEntry.value)) {
-			 * messageBuilder.addData(mapEntry.key, mapEntry.value); } }
-			 */
+			Boolean delayWhileIdle = message.getDelayWhileIdle();
+			if (delayWhileIdle != null) {
+				messageBuilder.delayWhileIdle(delayWhileIdle);
+			}
+
+			Boolean dryRun = message.getDryRun();
+			if (dryRun != null) {
+				messageBuilder.dryRun(dryRun);
+			}
+
+			String data = message.getData();
+			if (!data.isEmpty()) {
+				// build hasmap from plain text string
+				Map<String, String> mapData = new HashMap<String, String>();
+
+				for (String keyValue : data.split(" *& *")) {
+					String[] pairs = keyValue.split(" *= *", 2);
+					mapData.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
+				}
+				// pass data to message class
+				for (Map.Entry<String, String> entry : mapData.entrySet()) {
+					if (entry.getValue() != "") {
+						messageBuilder
+								.addData(entry.getKey(), entry.getValue());
+					}
+				}
+			}
 			// send a single message using plain post
 			result = this.sender.sendHttpPlainText(messageBuilder.build(),
 					registrationId, 5);
@@ -178,25 +196,37 @@ public class NotificationController {
 			if (!collapseKey.isEmpty()) {
 				messageBuilder.collapseKey(collapseKey.trim());
 			}
+
 			String restrictedPackageName = message.getRestrictedPackageName();
 			if (!restrictedPackageName.isEmpty()) {
 				messageBuilder.restrictedPackageName(restrictedPackageName
 						.trim());
 			}
+
 			Integer timeToLive = message.getTimeToLive();
 			if (timeToLive != null) {
 				messageBuilder.timeToLive(timeToLive);
 			}
+
 			Integer prority = message.getPriority();
 			if (prority != null) {
 				messageBuilder.priority(prority);
 			}
-			// Boolean
-			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
-			// Boolean
-			messageBuilder.dryRun(message.getDryRun());
-			// Boolean
-			messageBuilder.contentAvailable(message.getContentAvailable());
+
+			Boolean delayWhileIdle = message.getDelayWhileIdle();
+			if (delayWhileIdle != null) {
+				messageBuilder.delayWhileIdle(delayWhileIdle);
+			}
+
+			Boolean dryRun = message.getDryRun();
+			if (dryRun != null) {
+				messageBuilder.dryRun(dryRun);
+			}
+
+			Boolean contentAvailable = message.getContentAvailable();
+			if (contentAvailable != null) {
+				messageBuilder.contentAvailable(contentAvailable);
+			}
 
 			if (message.getEnableNotification()) {
 				HashMap<String, String> noti = new HashMap<String, String>(
@@ -210,13 +240,37 @@ public class NotificationController {
 
 			}
 
-			// TODO Add data fields
+			// Convert the json string stored in data to a HashMap and build
+			// data in message class
+			String data = message.getData();
+			if (!data.isEmpty()) {
+				Map<String, String> mapData = new HashMap<String, String>();
+				ObjectMapper mapper = new ObjectMapper();
+				try {
+					// convert JSON string to Map
+					mapData = mapper.readValue(data,
+							new TypeReference<HashMap<String, String>>() {
+							});
+					for (Map.Entry<String, String> entry : mapData.entrySet()) {
+						if (entry.getValue() != "") {
+							messageBuilder.addData(entry.getKey(),
+									entry.getValue());
+						}
+					}
+				} catch (Exception e) {
+					logger.error("Error while creating HasMap from data string "
+							+ e.toString());
+					e.printStackTrace();
+				}
+			}
+
+			// Send the message to the target device
 			try {
 				multicastResult = sender.sendHttpJson(messageBuilder.build(),
 						targetList, 5);
 				List<Result> results = multicastResult.getResults();
-				// analyze the results
 
+				// analyze the results
 				String regId = targetList.get(0);
 				Result result = results.get(0);
 				String messageId = result.getMessageId();

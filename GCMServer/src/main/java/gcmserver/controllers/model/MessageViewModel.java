@@ -45,11 +45,11 @@ public final class MessageViewModel {
 	 * String notificationClickAction;
 	 */
 
-	private Map<String, String> data;
+	private String data;
 	private Map<String, String> notification;
 
 	public MessageViewModel() {
-		this.data = new LinkedHashMap<String, String>();
+		// this.data = new LinkedHashMap<String, String>();
 		this.notification = new LinkedHashMap<String, String>();
 		notification.put("title", "");
 		notification.put("body", "");
@@ -213,7 +213,7 @@ public final class MessageViewModel {
 	/**
 	 * @return the data
 	 */
-	public Map<String, String> getData() {
+	public String getData() {
 		return data;
 	}
 
@@ -221,7 +221,7 @@ public final class MessageViewModel {
 	 * @param data
 	 *            the data to set
 	 */
-	public void setData(Map<String, String> data) {
+	public void setData(String data) {
 		this.data = data;
 	}
 
@@ -261,7 +261,7 @@ public final class MessageViewModel {
 		if (target != null) {
 			builder.append("target=").append(target).append(", ");
 		}
-		if (collapseKey != null) {
+		if (collapseKey != null && !collapseKey.isEmpty()) {
 			builder.append("collapseKey=").append(collapseKey).append(", ");
 		}
 		if (priority != null) {
@@ -282,7 +282,7 @@ public final class MessageViewModel {
 			builder.append("delayWhileIdle=").append(delayWhileIdle)
 					.append(", ");
 		}
-		if (restrictedPackageName != null) {
+		if (restrictedPackageName != null && !restrictedPackageName.isEmpty()) {
 			builder.append("restrictedPackageName=")
 					.append(restrictedPackageName).append(", ");
 		}
@@ -290,8 +290,11 @@ public final class MessageViewModel {
 			builder.append("dryRun=").append(dryRun).append(", ");
 		}
 
-		if (!notification.isEmpty()) {
-			builder.append("notification: {");
+		// If the value title is and empty string there is not notification
+		// payload since this field is required, so not need to print the
+		// notification payload
+		if (!notification.isEmpty() && notification.get("title") != "") {
+			builder.append("notification: { ");
 			for (Map.Entry<String, String> entry : notification.entrySet()) {
 				if (entry.getValue() != "") {
 					builder.append(entry.getKey()).append("=")
@@ -299,18 +302,13 @@ public final class MessageViewModel {
 				}
 			}
 			builder.delete(builder.length() - 1, builder.length());
-			builder.append("} ");
+			builder.append(" }, ");
 		}
 
-		if (!data.isEmpty()) {
-			builder.append("data: {");
-			for (Map.Entry<String, String> entry : data.entrySet()) {
-				builder.append(entry.getKey()).append("=")
-						.append(entry.getValue()).append(",");
-			}
-			builder.delete(builder.length() - 1, builder.length());
-			builder.append("} ");
+		if (data != null && !data.isEmpty() && !data.equals("{}")) {
+			builder.append("data: { ").append(data).append(" }");
 		}
+
 		if (builder.charAt(builder.length() - 1) == ' ') {
 			builder.delete(builder.length() - 2, builder.length());
 		}

@@ -18,6 +18,9 @@
 	href="/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css"
 	th:href="@{/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css}"
 	rel="stylesheet"></link>
+<link href="/libs/jsoneditor-4.2.1/dist/jsoneditor.min.css"
+	th:href="@{/libs/jsoneditor-4.2.1/dist/jsoneditor.min.css}"
+	rel="stylesheet"></link>
 <link href="/css/styles.css" th:href="@{/css/styles.css}"
 	rel="stylesheet"></link>
 
@@ -136,9 +139,23 @@
 							</div>
 							<h3>Payload</h3>
 							<div class="form-group">
+								<label for="input_add_data_field_key"
+									class="col-lg-4 control-label">data field</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control"
+										id="input_plain_data_field_key" placeholder="key"></input> <input
+										type="text" class="form-control"
+										id="input_plain_data_field_value" placeholder="value"></input>
+								</div>
+								<div class="col-lg-offset-4 col-lg-8">
+									<button id="btn_add_plain_data_field" type="button"
+										class="btn btn-default">Add field</button>
+								</div>
+							</div>
+							<div class="form-group">
 								<label for="input_payload_data" class="col-lg-4 control-label">data</label>
 								<div class="col-lg-8">
-									<textarea class="form-control" rows="3" id="input_payload_data"></textarea>
+									<textarea class="form-control" rows="3" id="input_payload_data" th:field="*{data}"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -363,11 +380,21 @@
 										role="tabpanel" aria-labelledby="headingTwo">
 										<div class="panel-body">
 											<div class="form-group">
+												<div class="col-lg-12" style="height: 300px;"
+													id="dataEditorJsonSingle"></div>
+												<div class="col-lg-offset-4 col-lg-8">
+													<button id="btn_clear_dataEditor" type="button"
+														class="btn btn-default">Clear data</button>
+													<button id="btn_save_dataEditor" type="button"
+														class="btn btn-default">Save data</button>
+												</div>
+											</div>
+											<div class="form-group">
 												<label for="input_payload_data"
-													class="col-lg-4 control-label">data</label>
-												<div class="col-lg-8">
+													class="col-lg-12 control-label">Preview plain text</label>
+												<div class="col-lg-12">
 													<textarea class="form-control" rows="3"
-														id="input_payload_data"></textarea>
+														id="input_payload_data" th:field="*{data}"></textarea>
 												</div>
 											</div>
 										</div>
@@ -669,17 +696,11 @@
 		src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-	<script src="/js/scripts.js" th:src="@{/js/scripts.js}"></script>
 	<script
 		src="/libs/Bootstrap-color-picker2.2/dist/js/bootstrap-colorpicker.min.js"
 		th:src="@{/libs/Bootstrap-color-picker2.2/dist/js/bootstrap-colorpicker.min.js}"></script>
-
-	<script>
-		$(function() {
-			$('.demo2').colorpicker();
-		});
-	</script>
-
-
+	<script src="/libs/jsoneditor-4.2.1/dist/jsoneditor.min.js"
+		th:src="@{/libs/jsoneditor-4.2.1/dist/jsoneditor.min.js}"></script>
+	<script src="/js/scripts.js" th:src="@{/js/scripts.js}"></script>
 </body>
 </html>

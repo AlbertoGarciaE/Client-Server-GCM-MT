@@ -14,13 +14,14 @@
 <link
 	href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
 	rel="stylesheet"></link>
+<link
+	href="/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css"
+	th:href="@{/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css}"
+	rel="stylesheet"></link>
+<link href="/css/styles.css" th:href="@{/css/styles.css}"
+	rel="stylesheet"></link>
 
-<style type="text/css">
-.form-group.required .control-label:after {
-	content: "*";
-	color: red;
-}
-</style>
+
 
 </head>
 <body>
@@ -246,18 +247,131 @@
 								</div>
 							</div>
 							<h3>Payload</h3>
-							<div class="form-group">
-								<label for="input_payload_notification"
-									class="col-lg-4 control-label">notification</label>
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3"
-										id="input_payload_notification"></textarea>
+							<div class="panel-group" id="accordion" role="tablist"
+								aria-multiselectable="true">
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab" id="headingOne">
+										<h4 class="panel-title">
+											<a role="button" data-toggle="collapse"
+												data-parent="#accordion" href="#collapseOne"
+												aria-expanded="true" aria-controls="collapseOne">
+												Notification </a>
+										</h4>
+									</div>
+									<div id="collapseOne" class="panel-collapse collapse in"
+										role="tabpanel" aria-labelledby="headingOne">
+										<div class="panel-body">
+											<div class="form-group">
+												<label for="input_notification"
+													class="col-lg-4 control-label">Enable notification</label>
+												<div class="col-lg-8">
+													<div class="checkbox">
+														<label> <input type="checkbox"
+															id="input_notification" th:field="*{enableNotification}"></input>Check
+															/ Uncheck
+														</label>
+													</div>
+												</div>
+											</div>
+											<div class="form-group required">
+												<label for="input_notification_title"
+													class="col-lg-4 control-label">title</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_title" placeholder="title"
+														th:field="*{notification[title]}" required=''
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_body"
+													class="col-lg-4 control-label">body</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_body" placeholder="body"
+														th:field="*{notification[body]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group required">
+												<label for="input_notification_icon"
+													class="col-lg-4 control-label">icon</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_icon" placeholder="icon"
+														th:field="*{notification[icon]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_sound"
+													class="col-lg-4 control-label">sound</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_sound" placeholder="sound"
+														th:field="*{notification[sound]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_tag"
+													class="col-lg-4 control-label">tag</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_tag" placeholder="tag"
+														th:field="*{notification[tag]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_color"
+													class="col-lg-4 control-label">color</label>
+												<div class="col-lg-8">
+													<div class="input-group demo2">
+														<input type="text" class="form-control"
+															id="input_notification_color" placeholder="color #rrggbb"
+															th:field="*{notification[color]}"
+															th:disabled="*{!enableNotification}"></input> <span
+															class="input-group-addon"><i></i></span>
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_click_action"
+													class="col-lg-4 control-label">click_action</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_click_action"
+														placeholder="click_action"
+														th:field="*{notification[clickAction]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_payload_data" class="col-lg-4 control-label">data</label>
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3" id="input_payload_data"></textarea>
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab" id="headingTwo">
+										<h4 class="panel-title">
+											<a class="collapsed" role="button" data-toggle="collapse"
+												data-parent="#accordion" href="#collapseTwo"
+												aria-expanded="false" aria-controls="collapseTwo"> Data
+											</a>
+										</h4>
+									</div>
+									<div id="collapseTwo" class="panel-collapse collapse"
+										role="tabpanel" aria-labelledby="headingTwo">
+										<div class="panel-body">
+											<div class="form-group">
+												<label for="input_payload_data"
+													class="col-lg-4 control-label">data</label>
+												<div class="col-lg-8">
+													<textarea class="form-control" rows="3"
+														id="input_payload_data"></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
@@ -284,7 +398,7 @@
 									class="col-lg-4 control-label">registration_ids</label>
 								<div class="col-lg-8">
 									<select class="form-control" id="input_registration_ids"
-										required="" multiple="" th:field="*{target}">
+										required="" multiple="" th:field="*{listTargets}">
 										<option value="">Select one...</option>
 										<option th:each="device : ${deviceList}"
 											th:value="${device.registrationId}" th:text="${device.name}"
@@ -555,6 +669,17 @@
 		src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script
 		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="/js/scripts.js" th:src="@{/js/scripts.js}"></script>
+	<script
+		src="/libs/Bootstrap-color-picker2.2/dist/js/bootstrap-colorpicker.min.js"
+		th:src="@{/libs/Bootstrap-color-picker2.2/dist/js/bootstrap-colorpicker.min.js}"></script>
+
+	<script>
+		$(function() {
+			$('.demo2').colorpicker();
+		});
+	</script>
+
 
 </body>
 </html>

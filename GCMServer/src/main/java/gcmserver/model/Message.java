@@ -182,6 +182,62 @@ public final class Message implements Serializable {
 			return this;
 		}
 
+		 /**
+         * Sets the notification icon.
+         */
+        public Builder notificationIcon(String value) {
+        	notification.put("icon", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification title text.
+         */
+        public Builder notificationTitle(String value) {
+        	notification.put("title", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification body text.
+         */
+        public Builder notificationBody(String value) {
+        	notification.put("body", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification click action.
+         */
+        public Builder notificationClickAction(String value) {
+        	notification.put("click_action", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification sound.
+         */
+        public Builder notificationSound(String value) {
+        	notification.put("sound", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification tag.
+         */
+        public Builder notificationTag(String value) {
+        	notification.put("tag", value);
+            return this;
+        }
+
+        /**
+         * Sets the notification color.
+         */
+        public Builder notificationColor(String value) {
+        	notification.put("color", value);
+            return this;
+        }
+		
 		public Message build() {
 			return new Message(this);
 		}

@@ -24,7 +24,7 @@ import java.util.Map;
  * GCM message.
  *
  */
-public final class MessageViewModel implements Serializable {
+public final class MessageViewModel {
 	private String target;
 	private List<String> listTargets;
 	// optional parameters
@@ -36,13 +36,28 @@ public final class MessageViewModel implements Serializable {
 	private Boolean deliveryReceiptRequested;
 	private String restrictedPackageName;
 	private Boolean dryRun;
+	// Notification parameters
+	private boolean enableNotification;
+	/*
+	 * private String notificationTitle; private String notificationBody;
+	 * private String notificationIcon; private String notificationSound;
+	 * private String notificationTag; private String notificationColor; private
+	 * String notificationClickAction;
+	 */
 
-	private final Map<String, String> data;
-	private final Map<String, String> notification;
+	private Map<String, String> data;
+	private Map<String, String> notification;
 
 	public MessageViewModel() {
 		this.data = new LinkedHashMap<String, String>();
 		this.notification = new LinkedHashMap<String, String>();
+		notification.put("title", "");
+		notification.put("body", "");
+		notification.put("icon", "");
+		notification.put("sound", "");
+		notification.put("tag", "");
+		notification.put("color", "");
+		notification.put("clickAction", "");
 	}
 
 	/**
@@ -181,6 +196,21 @@ public final class MessageViewModel implements Serializable {
 	}
 
 	/**
+	 * @return the notification
+	 */
+	public Map<String, String> getNotification() {
+		return notification;
+	}
+
+	/**
+	 * @param notification
+	 *            the notification to set
+	 */
+	public void setNotification(Map<String, String> notification) {
+		this.notification = notification;
+	}
+
+	/**
 	 * @return the data
 	 */
 	public Map<String, String> getData() {
@@ -188,10 +218,11 @@ public final class MessageViewModel implements Serializable {
 	}
 
 	/**
-	 * @return the notification
+	 * @param data
+	 *            the data to set
 	 */
-	public Map<String, String> getNotification() {
-		return notification;
+	public void setData(Map<String, String> data) {
+		this.data = data;
 	}
 
 	/**
@@ -209,7 +240,21 @@ public final class MessageViewModel implements Serializable {
 		this.listTargets = listTargets;
 	}
 
-	// TODO add target a el metodo to string
+	/**
+	 * @return the enableNotification
+	 */
+	public boolean getEnableNotification() {
+		return enableNotification;
+	}
+
+	/**
+	 * @param enableNotification
+	 *            the enableNotification to set
+	 */
+	public void setEnableNotification(boolean enableNotification) {
+		this.enableNotification = enableNotification;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Message(");
@@ -244,6 +289,19 @@ public final class MessageViewModel implements Serializable {
 		if (dryRun != null) {
 			builder.append("dryRun=").append(dryRun).append(", ");
 		}
+
+		if (!notification.isEmpty()) {
+			builder.append("notification: {");
+			for (Map.Entry<String, String> entry : notification.entrySet()) {
+				if (entry.getValue() != "") {
+					builder.append(entry.getKey()).append("=")
+							.append(entry.getValue()).append(",");
+				}
+			}
+			builder.delete(builder.length() - 1, builder.length());
+			builder.append("} ");
+		}
+
 		if (!data.isEmpty()) {
 			builder.append("data: {");
 			for (Map.Entry<String, String> entry : data.entrySet()) {
@@ -251,16 +309,7 @@ public final class MessageViewModel implements Serializable {
 						.append(entry.getValue()).append(",");
 			}
 			builder.delete(builder.length() - 1, builder.length());
-			builder.append("}, ");
-		}
-		if (!notification.isEmpty()) {
-			builder.append("notification: {");
-			for (Map.Entry<String, String> entry : notification.entrySet()) {
-				builder.append(entry.getKey()).append("=")
-						.append(entry.getValue()).append(",");
-			}
-			builder.delete(builder.length() - 1, builder.length());
-			builder.append("}");
+			builder.append("} ");
 		}
 		if (builder.charAt(builder.length() - 1) == ' ') {
 			builder.delete(builder.length() - 2, builder.length());

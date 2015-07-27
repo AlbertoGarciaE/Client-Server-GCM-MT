@@ -4,14 +4,15 @@ import gcmserver.controllers.model.MessageViewModel;
 import gcmserver.core.Constants;
 import gcmserver.core.DeviceManager;
 import gcmserver.core.Sender;
-import gcmserver.model.Devices;
 import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -197,8 +198,22 @@ public class NotificationController {
 			// Boolean
 			messageBuilder.contentAvailable(message.getContentAvailable());
 
+			if (message.getEnableNotification()) {
+				HashMap<String, String> noti = new HashMap<String, String>(
+						message.getNotification());
+				for (Map.Entry<String, String> entry : noti.entrySet()) {
+					if (entry.getValue() != "") {
+						messageBuilder.addNotification(entry.getKey(),
+								entry.getValue());
+					}
+				}
+
+			}
+
+			// TODO Add data fields
 			try {
-				multicastResult = sender.sendHttpJson(messageBuilder.build(), targetList, 5);
+				multicastResult = sender.sendHttpJson(messageBuilder.build(),
+						targetList, 5);
 				List<Result> results = multicastResult.getResults();
 				// analyze the results
 
@@ -262,7 +277,7 @@ public class NotificationController {
 			@ModelAttribute MessageViewModel message, HttpSession sesion,
 			Model modelo) {
 		/*
-		 * TODO Send http JSON notification
+		 * TODO Send http JSON notification to multiple devices. DEPRECATED
 		 */
 		List<String> targetList = message.getListTargets();
 		String status;
@@ -276,7 +291,7 @@ public class NotificationController {
 			// If we are sending a multicast message using JSON
 			// we must split in chunks of 1000 devices due to GCM limit
 
-			//Build message
+			// Build message
 			final Message.Builder messageBuilder = new Message.Builder();
 			String collapseKey = message.getCollapseKey();
 			if (!collapseKey.isEmpty()) {
@@ -320,9 +335,13 @@ public class NotificationController {
 					+ " multicast messages to " + total + " devices";
 		}
 		logger.info(status);
-		// TODO recuperar la multiastResponse
-		modelo.addAttribute("message", message);
-		// modelo.addAttribute("response", result.toString());
+		modelo.addAttribute("messagePlain", messagePlain);
+		modelo.addAttribute("messageJson", messageJson);
+		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		modelo.addAttribute("messageXMPP", messageXMPP);
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
+		modelo.addAttribute("request", message.toString());
+		modelo.addAttribute("response", status.toString());
 		logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", modelo);
 	}
@@ -341,8 +360,7 @@ public class NotificationController {
 	 * @param partialTargets
 	 * @param message
 	 */
-	private void asyncSend(List<String> partialTargets,
-			final Message message) {
+	private void asyncSend(List<String> partialTargets, final Message message) {
 		// make a copy
 		final List<String> devices = new ArrayList<String>(partialTargets);
 

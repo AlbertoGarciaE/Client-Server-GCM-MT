@@ -56,6 +56,19 @@ $('document')
 						$("#form_http_json textarea#input_payload_data").val(
 								text);
 					}
+					// set empty json
+					function clearEditor2() {
+						var json = {};
+						editor2.set(json);
+					}
+
+					// get json and parse to textarea
+					function saveEditor2() {
+						var json = editor2.get();
+						var text = JSON.stringify(json)
+						$("#form_topic_message textarea#input_payload_data").val(
+								text);
+					}
 
 					function addPlainDataField() {
 						var text = $(
@@ -80,8 +93,14 @@ $('document')
 					var container = document
 							.getElementById("dataEditorJsonSingle");
 					var editor = new JSONEditor(container);
-					$("#btn_clear_dataEditor").on("click", clearEditor);
-					$("#btn_save_dataEditor").on("click", saveEditor);
-					$("#btn_add_plain_data_field").on("click",
+					var container2 = document
+							.getElementById("dataEditorTopicMEssage");
+					var editor2 = new JSONEditor(container2);
+					$("#form_topic_message #btn_clear_dataEditor").on("click", clearEditor2);
+					$("#form_topic_message #btn_save_dataEditor").on("click", saveEditor2);
+					$("#form_http_json #btn_clear_dataEditor").on("click", clearEditor);
+					$("#form_http_json #btn_save_dataEditor").on("click", saveEditor);
+					$("#form_http_plain #btn_add_plain_data_field").on("click",
 							addPlainDataField);
+
 				});

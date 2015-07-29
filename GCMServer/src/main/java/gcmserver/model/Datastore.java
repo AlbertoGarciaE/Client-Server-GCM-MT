@@ -71,7 +71,7 @@ public final class Datastore {
 
 			logger.debug("Marshalling to XML file");
 			// Write the XML File
-			m.marshal((Devices) object, out);
+			m.marshal(object, out);
 		} catch (Exception e) {
 			logger.error("Marshalling to XML file failed: " + e.toString());
 			e.printStackTrace();

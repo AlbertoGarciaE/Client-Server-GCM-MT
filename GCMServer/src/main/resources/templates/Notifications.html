@@ -36,7 +36,7 @@
 			<li class="active"><a href="#" th:href="@{/Notification/}">Downstream</a></li>
 			<li><a href="#">Upstream</a></li>
 			<li><a href="#">Groups</a></li>
-			<li><a href="#">Topics</a></li>
+			<li><a href="#" th:href="@{/Topics/}">Topics</a></li>
 			<li><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
 			<li class="divider-vertical"></li>
 			<li><a href="#">Settings</a></li>
@@ -53,6 +53,9 @@
 					<li role="presentation"><a href="" data-target="#http_json"
 						aria-controls="http_json" role="tab" data-toggle="tab" class="">HTTP
 							JSON</a></li>
+					<li role="presentation"><a href=""
+						data-target="#topic_message" aria-controls="topic_message"
+						role="tab" data-toggle="tab" class="">Topic message</a></li>
 					<li role="presentation"><a href=""
 						data-target="#http_json_multi" aria-controls="http_json_multi"
 						role="tab" data-toggle="tab" class="">HTTP JSON Multi</a></li>
@@ -155,7 +158,8 @@
 							<div class="form-group">
 								<label for="input_payload_data" class="col-lg-4 control-label">data</label>
 								<div class="col-lg-8">
-									<textarea class="form-control" rows="3" id="input_payload_data" th:field="*{data}"></textarea>
+									<textarea class="form-control" rows="3" id="input_payload_data"
+										th:field="*{data}"></textarea>
 								</div>
 							</div>
 							<div class="form-group">
@@ -410,6 +414,248 @@
 						</form>
 					</div>
 					<!-- END Tab HTTP JSON -->
+					<!-- Tab Topic message-->
+					<div role="tabpanel" class="tab-pane" id="topic_message">
+						<h2>Topic message</h2>
+						<p>Send a message to all the devices registered to a specific
+							topic</p>
+						<form id="form_topic_message" class="form-horizontal" role="form"
+							action="#" th:action="@{/Notification/topicMessage}"
+							th:object="${messageTopic}" method="post">
+							<h3>Target topic</h3>
+							<div class="form-group required">
+								<label for="input_to" class="col-lg-4 control-label">to</label>
+								<div class="col-lg-8">
+									<select class="form-control" id="input_to" required=""
+										th:field="*{target}">
+										<option value="">Select one...</option>
+										<option th:each="topic : ${topicList}"
+											th:value="${topic.url}" th:text="${topic.name}" value="Uno">Uno</option>
+									</select>
+								</div>
+							</div>
+							<h3>Options</h3>
+							<div class="form-group">
+								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control" id="input_collapse_key"
+										placeholder="collapse_key" th:field="*{collapseKey}"></input>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_priority" class="col-lg-4 control-label">priority</label>
+								<div class="col-lg-8">
+									<input type="number" max="10" min="0" class="form-control"
+										id="input_priority" placeholder="priority"
+										th:field="*{priority}"></input>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_content_available"
+									class="col-lg-4 control-label">content_available</label>
+								<div class="col-lg-8">
+									<div class="checkbox">
+										<label> <input type="checkbox"
+											id="input_content_available" th:field="*{contentAvailable}"></input>Check
+											/ Uncheck
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_delay_while_idle"
+									class="col-lg-4 control-label">delay_while_idle</label>
+								<div class="col-lg-8">
+									<div class="checkbox">
+										<label> <input type="checkbox"
+											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
+											/ Uncheck
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_time_to_live" class="col-lg-4 control-label">time_to_live</label>
+								<div class="col-lg-8">
+									<div class="input-group">
+										<input type="number" max="2419200" min="0"
+											class="form-control" id="input_time_to_live"
+											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
+											class="input-group-addon">sec</span>
+									</div>
+									<p id="helpBlock" class="help-block">This parameter
+										specifies how long (in seconds) the message should be kept in
+										GCM storage if the device is offline. The maximum time to live
+										supported is 4 weeks.</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_restricted_package_name"
+									class="col-lg-4 control-label">restricted_package_name</label>
+								<div class="col-lg-8">
+									<input type="text" class="form-control"
+										id="input_restricted_package_name"
+										placeholder="restricted_package_name"
+										th:field="*{restrictedPackageName}"></input>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="input_dry_run" class="col-lg-4 control-label">dry_run</label>
+								<div class="col-lg-8">
+									<div class="checkbox">
+										<label> <input type="checkbox" id="input_dry_run"
+											th:field="*{dryRun}"></input>Check / Uncheck
+										</label>
+									</div>
+								</div>
+							</div>
+							<h3>Payload</h3>
+							<div class="panel-group" id="accordion" role="tablist"
+								aria-multiselectable="true">
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab" id="headingOne">
+										<h4 class="panel-title">
+											<a role="button" data-toggle="collapse"
+												data-parent="#accordion" href="#collapseOne"
+												aria-expanded="true" aria-controls="collapseOne">
+												Notification </a>
+										</h4>
+									</div>
+									<div id="collapseOne" class="panel-collapse collapse in"
+										role="tabpanel" aria-labelledby="headingOne">
+										<div class="panel-body">
+											<div class="form-group">
+												<label for="input_notification"
+													class="col-lg-4 control-label">Enable notification</label>
+												<div class="col-lg-8">
+													<div class="checkbox">
+														<label> <input type="checkbox"
+															id="input_notification" th:field="*{enableNotification}"></input>Check
+															/ Uncheck
+														</label>
+													</div>
+												</div>
+											</div>
+											<div class="form-group required">
+												<label for="input_notification_title"
+													class="col-lg-4 control-label">title</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_title" placeholder="title"
+														th:field="*{notification[title]}" required=''
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_body"
+													class="col-lg-4 control-label">body</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_body" placeholder="body"
+														th:field="*{notification[body]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group required">
+												<label for="input_notification_icon"
+													class="col-lg-4 control-label">icon</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_icon" placeholder="icon"
+														th:field="*{notification[icon]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_sound"
+													class="col-lg-4 control-label">sound</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_sound" placeholder="sound"
+														th:field="*{notification[sound]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_tag"
+													class="col-lg-4 control-label">tag</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_tag" placeholder="tag"
+														th:field="*{notification[tag]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_color"
+													class="col-lg-4 control-label">color</label>
+												<div class="col-lg-8">
+													<div class="input-group demo2">
+														<input type="text" class="form-control"
+															id="input_notification_color" placeholder="color #rrggbb"
+															th:field="*{notification[color]}"
+															th:disabled="*{!enableNotification}"></input> <span
+															class="input-group-addon"><i></i></span>
+													</div>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_notification_click_action"
+													class="col-lg-4 control-label">click_action</label>
+												<div class="col-lg-8">
+													<input type="text" class="form-control"
+														id="input_notification_click_action"
+														placeholder="click_action"
+														th:field="*{notification[clickAction]}"
+														th:disabled="*{!enableNotification}"></input>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab" id="headingTwo">
+										<h4 class="panel-title">
+											<a class="collapsed" role="button" data-toggle="collapse"
+												data-parent="#accordion" href="#collapseTwo"
+												aria-expanded="false" aria-controls="collapseTwo"> Data
+											</a>
+										</h4>
+									</div>
+									<div id="collapseTwo" class="panel-collapse collapse"
+										role="tabpanel" aria-labelledby="headingTwo">
+										<div class="panel-body">
+											<div class="form-group">
+												<div class="col-lg-12" style="height: 300px;"
+													id="dataEditorTopicMEssage"></div>
+												<div class="col-lg-offset-4 col-lg-8">
+													<button id="btn_clear_dataEditor" type="button"
+														class="btn btn-default">Clear data</button>
+													<button id="btn_save_dataEditor" type="button"
+														class="btn btn-default">Save data</button>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="input_payload_data"
+													class="col-lg-12 control-label">Preview plain text</label>
+												<div class="col-lg-12">
+													<textarea class="form-control" rows="3"
+														id="input_payload_data" th:field="*{data}"></textarea>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-offset-6 col-lg-6">
+									<input type="submit" class="btn btn-default" value="Send"></input>
+									<input type="reset" class="btn btn-default" value="Clear"></input>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- END Tab Topic message -->
 					<!-- Tab HTTP JSON Multi -->
 					<div role="tabpanel" class="tab-pane" id="http_json_multi">
 						<h2>HTTP JSON Multi</h2>

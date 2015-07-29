@@ -1,8 +1,9 @@
 <!DOCTYPE html>
+<!-- saved from url=(0030)http://www.codeply.com/api/run -->
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></meta>
 <meta charset="utf-8"></meta>
-<title>GCM testing tool</title>
 <title>GCM testing tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
@@ -13,8 +14,16 @@
 <link
 	href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
 	rel="stylesheet"></link>
+<link
+	href="/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css"
+	th:href="@{/libs/Bootstrap-color-picker2.2/dist/css/bootstrap-colorpicker.min.css}"
+	rel="stylesheet"></link>
+<link href="/libs/jsoneditor-4.2.1/dist/jsoneditor.min.css"
+	th:href="@{/libs/jsoneditor-4.2.1/dist/jsoneditor.min.css}"
+	rel="stylesheet"></link>
 <link href="/css/styles.css" th:href="@{/css/styles.css}"
 	rel="stylesheet"></link>
+
 </head>
 <body>
 	<div class="navbar navbar-default">
@@ -25,51 +34,51 @@
 			<li><a href="#" th:href="@{/Notification/}">Downstream</a></li>
 			<li><a href="#">Upstream</a></li>
 			<li><a href="#">Groups</a></li>
-			<li><a href="#" th:href="@{/Topics/}">Topics</a></li>
-			<li class="active"><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
+			<li class="active"><a href="#" th:href="@{/Topics/}">Topics</a></li>
+			<li><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
 			<li class="divider-vertical"></li>
 			<li><a href="#">Settings</a></li>
 		</ul>
 	</div>
 	<div class="container">
 		<div class="col-md-12">
-			<h2>Devices Management</h2>
-			<p>In this section you can manage the registration id of the
-				different devices you will use within this tool</p>
-			<h3>Add device</h3>
-			<form id="form_register_device" class="form-inline" role="form"
-				action="#" th:action="@{/deviceManagement/registerDevice}"
-				th:object="${newDevice}" method="post">
+			<h2>Topics Management</h2>
+			<p>In this section you can manage the topics which the devices
+				can register to and receive notifications</p>
+			<h3>Add topic</h3>
+			<form id="form_register_topic" class="form-inline" role="form"
+				action="#" th:action="@{/Topics/registerTopic}"
+				th:object="${newTopic}" method="post">
 				<div class="form-group required">
-					<label for="input_device_name" class="control-label">Device
-						name</label><input type="text" class="form-control" id="input_device_name"
-						placeholder="device name" required="" th:field="*{name}"></input>
+					<label for="input_topic_name" class="control-label">Topic
+						name</label><input type="text" class="form-control" id="input_topic_name"
+						placeholder="topic name" required="" th:field="*{name}"></input>
 				</div>
 				<div class="form-group required">
-					<label for="input_registration_id" class="control-label">registration_id</label>
-					<input type="text" class="form-control" id="input_registration_id"
-						placeholder="registration_id" required=""
-						th:field="*{registrationId}"></input>
+					<label for="input_topic_URL" class="control-label">Topic
+						URL</label> <input type="text" class="form-control" id="input_topic_URL"
+						placeholder="/topics/[a-zA-Z0-9-_.~%]+" required=""
+						th:field="*{url}"></input>
 				</div>
 				<input type="submit" class="btn btn-default" value="Send"></input> <input
 					type="reset" class="btn btn-default" value="Clear"></input>
 
 			</form>
-			<h3>Devices</h3>
+			<h3>Topics</h3>
 			<table class="table table-hover">
 				<thead>
 					<tr>
-						<th>Device name</th>
-						<th>Registration_id</th>
+						<th>Topic name</th>
+						<th>URL</th>
 						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:each="device : ${modelo.deviceList}" th:inline="text">
-						<td>[[${device.name}]]</td>
-						<td>[[${device.registrationId}]]</td>
+					<tr th:each="topic : ${modelo.topicList}" th:inline="text">
+						<td>[[${topic.name}]]</td>
+						<td>[[${topic.url}]]</td>
 						<td><a href="#"
-							th:href="@{/deviceManagement/unregisterDevice(regId=${device.registrationId})}"
+							th:href="@{/Topics/unregisterTopic(url=${topic.url})}"
 							class="btn btn-default btn-sm">Remove</a></td>
 					</tr>
 				</tbody>

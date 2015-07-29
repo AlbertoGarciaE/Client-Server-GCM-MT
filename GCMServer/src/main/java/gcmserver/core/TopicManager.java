@@ -1,8 +1,8 @@
 package gcmserver.core;
 
 import gcmserver.model.Datastore;
-import gcmserver.model.Devices;
 import gcmserver.model.ObjectFactory;
+import gcmserver.model.Topics;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,24 +18,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-public class DeviceManager {
+public class TopicManager {
 
-	private final Logger logger = LoggerFactory.getLogger(DeviceManager.class);
-	// private List<Devices.Device> deviceList;
+	private final Logger logger = LoggerFactory.getLogger(TopicManager.class);
+	// private List<Topics.Topic> deviceList;
 	private final ObjectFactory factory;
-	private Devices devices;
-	private static DeviceManager instance;
+	private Topics topics;
+	private static TopicManager instance;
 	@Value("${gcm.XMLfile}")
-	private String XMLfile = "static/storage/deviceList.xml";
+	private String XMLfile = "static/storage/topicList.xml";
 
 	/**
 	 * 
 	 * @return
 	 */
-	public static DeviceManager getInstance() {
+	public static TopicManager getInstance() {
 
 		if (instance == null) {
-			return instance = new DeviceManager();
+			return instance = new TopicManager();
 		} else {
 			return instance;
 		}
@@ -44,42 +44,42 @@ public class DeviceManager {
 	/**
 	 * 
 	 */
-	private DeviceManager() {
+	private TopicManager() {
 		this.factory = new ObjectFactory();
-		this.devices = factory.createDevices();
+		this.topics = factory.createTopics();
 	}
 
 	/**
 	 * 
 	 * @param device
 	 */
-	public void registerDevice(String name, String regId) {
-		Devices.Device device = factory.createDevicesDevice();
-		device.setName(name);
-		device.setRegistrationId(regId);
-		devices.getDeviceList().add(device);
-		logger.info("Added " + device.toString() + " to list of devices");
+	public void registerTopic(String name, String url) {
+		Topics.Topic topic = factory.createTopicsTopic();
+		topic.setName(name);
+		topic.setUrl(url);
+		topics.getTopicsList().add(topic);
+		logger.info("Added " + topic.toString() + " to list of topics");
 	}
 
 	/**
 	 * 
 	 * @param device
 	 */
-	public void unregisterDevice(String regId) {
-		Devices.Device device = factory.createDevicesDevice();
-		device.setName("erase");
-		device.setRegistrationId(regId);
-		devices.getDeviceList().remove(device);
-		logger.info("Removed " + device.toString() + " from list of devices");
+	public void unregisterTopic(String url) {
+		Topics.Topic topic = factory.createTopicsTopic();
+		topic.setName("remove");
+		topic.setUrl(url);
+		topics.getTopicsList().remove(topic);
+		logger.info("Removed " + topic.toString() + " from list of topics");
 	}
 
 	/**
 	 * 
 	 * @return List<Device>
 	 */
-	public ArrayList<Devices.Device> getdeviceListSnapshot() {
-		logger.info("Returned a snapshot of list of devices");
-		return new ArrayList<Devices.Device>(devices.getDeviceList());
+	public ArrayList<Topics.Topic> getTopicsListSnapshot() {
+		logger.info("Returned a snapshot of list of topics");
+		return new ArrayList<Topics.Topic>(topics.getTopicsList());
 	}
 
 	/**
@@ -99,17 +99,17 @@ public class DeviceManager {
 			if (url != null) {
 				path = url.getFile();
 				InputStream is = new FileInputStream(path);
-				Devices auxDevices = (Devices) Datastore.unmarshalXMLData(is);
-				if (auxDevices.getDeviceList() != null) {
-					this.devices.getDeviceList().clear();
-					this.devices.getDeviceList().addAll(
-							auxDevices.getDeviceList());
+				Topics auxTopics = (Topics) Datastore.unmarshalXMLData(is);
+				if (auxTopics.getTopicsList() != null) {
+					this.topics.getTopicsList().clear();
+					this.topics.getTopicsList().addAll(
+							auxTopics.getTopicsList());
 				}
-				logger.info("List of devices readed from file "
+				logger.info("List of topics readed from file "
 						+ path.toString());
 				result = true;
 			} else {
-				logger.error("List of devices could not be readed from file "
+				logger.error("List of topics could not be readed from file "
 						+ XMLfile);
 				result = false;
 			}
@@ -140,12 +140,12 @@ public class DeviceManager {
 				path = url.getFile();
 				Writer writer = new FileWriter(path);
 				PrintWriter out = new PrintWriter(writer);
-				Datastore.marshalXML(out, devices);
-				logger.info("List of devices persisted to file "
+				Datastore.marshalXML(out, topics);
+				logger.info("List of topics persisted to file "
 						+ path.toString());
 				result = true;
 			} else {
-				logger.error("List of devices could not be saved to file "
+				logger.error("List of topics could not be saved to file "
 						+ XMLfile);
 				result = false;
 			}
@@ -159,20 +159,12 @@ public class DeviceManager {
 
 	}
 
-	public void updateRegistration(String regId, String canonicalRegId) {
-		Devices.Device device = factory.createDevicesDevice();
-		device.setName("update");
-		device.setRegistrationId(regId);
-		int index = devices.getDeviceList().indexOf(device);
-		devices.getDeviceList().get(index).setRegistrationId(canonicalRegId);
-	}
-
 	public void clearList() {
-		this.devices.getDeviceList().clear();
+		this.topics.getTopicsList().clear();
 	}
 
-	public Devices.Device getNewDevice() {
-		return factory.createDevicesDevice();
+	public Topics.Topic getNewTopic() {
+		return factory.createTopicsTopic();
 	}
 
 }

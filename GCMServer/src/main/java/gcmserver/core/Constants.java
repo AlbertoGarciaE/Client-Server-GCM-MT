@@ -15,7 +15,6 @@
  */
 package gcmserver.core;
 
-
 /**
  * Constants used on GCM service communication.
  */
@@ -215,6 +214,11 @@ public final class Constants {
 	 * JSON-only field sent by GCM when a message was successfully sent.
 	 */
 	public static final String JSON_MESSAGE_ID = "message_id";
+
+	/**
+	 * Limit for registrationIds in a group for messaging.
+	 */
+	public static final Integer GROUP_LIMIT_SIZE = 20;
 
 	private Constants() {
 		throw new UnsupportedOperationException();

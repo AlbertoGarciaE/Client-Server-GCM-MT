@@ -62,4 +62,20 @@ public class ObjectFactory {
 	public Topics.Topic createTopicsTopic() {
 		return new Topics.Topic();
 	}
+
+	/**
+	 * Create an instance of {@link Groups }
+	 * 
+	 */
+	public Groups createGroups() {
+		return new Groups();
+	}
+
+	/**
+	 * Create an instance of {@link Groups.Group }
+	 * 
+	 */
+	public Groups.Group createGroupsGroup() {
+		return new Groups.Group();
+	}
 }

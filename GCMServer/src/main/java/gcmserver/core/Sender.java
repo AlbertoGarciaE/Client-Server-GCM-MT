@@ -40,7 +40,6 @@ import static gcmserver.core.Constants.PARAM_TIME_TO_LIVE;
 import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
-import gcmserver.controllers.model.MessageViewModel;
 import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;

@@ -42,44 +42,71 @@
 	</div>
 	<div class="container">
 		<div class="col-md-12">
-			<h2>Topics Management</h2>
-			<p>In this section you can manage the topics which the devices
-				can register to and receive notifications</p>
-			<h3>Add topic</h3>
-			<form id="form_register_topic" class="form-inline" role="form"
-				action="#" th:action="@{/Topics/registerTopic}"
-				th:object="${newTopic}" method="post">
+			<h2>Device Groups Management</h2>
+			<p>In this section you can manage the groups for messaging that
+				can contain a maximum of 20 devices</p>
+			<h3>Add Group</h3>
+			<form id="form_register_group" class="form-inline" role="form"
+				action="#" th:action="@{/Groups/registerGroup}"
+				th:object="${newGroup}" method="get">
 				<div class="form-group required">
-					<label for="input_topic_name" class="control-label">Topic
-						name</label><input type="text" class="form-control" id="input_topic_name"
-						placeholder="topic name" required="" th:field="*{name}"></input>
-				</div>
-				<div class="form-group required">
-					<label for="input_topic_URL" class="control-label">Topic
-						URL</label> <input type="text" class="form-control" id="input_topic_URL"
-						placeholder="/topics/[a-zA-Z0-9-_.~%]+" required=""
-						th:field="*{url}"></input>
+					<label for="input_group_notification_key" class="control-label">Group
+						notification_key </label> <input type="text" class="form-control"
+						id="input_group_notification_key"
+						placeholder="group notification_key" required="" th:field="*{id}"></input>
 				</div>
 				<input type="submit" class="btn btn-default" value="Send"></input> <input
 					type="reset" class="btn btn-default" value="Clear"></input>
-
 			</form>
-			<h3>Topics</h3>
+			<h3>Add Members</h3>
+			<form id="form_add_regId_to_group" class="form-inline" role="form"
+				action="#" th:action="@{/Groups/registerDeviceInGroup}"
+				th:object="${newGroup}" method="post">
+				<div class="form-group required">
+					<label for="input_group_notification_key" class="control-label">Group
+						notification_key </label> <select class="form-control"
+						id="input_group_notification_key" required="" th:field="*{id}">
+						<option value="">Select one...</option>
+						<option th:each="group : ${groupList}" th:value="${group.id}"
+							th:text="${group.id}" value="Uno">Uno</option>
+					</select>
+				</div>
+				<div class="form-group required">
+					<label for="input_group_registrationIds" class="control-label">Targets
+					</label> <select class="form-control" id="input_group_notification_key"
+						required="" th:field="*{regIds}">
+						<option value="">Select one...</option>
+						<option th:each="device : ${deviceList}"
+							th:value="${device.registrationId}" th:text="${device.name}"
+							value="Uno">Uno</option>
+					</select>
+				</div>
+				<input type="submit" class="btn btn-default" value="Send"></input> <input
+					type="reset" class="btn btn-default" value="Clear"></input>
+			</form>
+			<h3>Groups</h3>
 			<table class="table table-hover">
 				<thead>
 					<tr>
-						<th>Topic name</th>
-						<th>URL</th>
+						<th>Group</th>
+						<th>Members</th>
 						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:each="topic : ${modelo.topicList}" th:inline="text">
-						<td>[[${topic.name}]]</td>
-						<td>[[${topic.url}]]</td>
+					<tr th:each="group : ${groupList}" th:inline="text">
+						<td>[[${group.id}]]</td>
+						<td>
+							<ul>
+								<li th:each="regId : ${group.registrationIdList}">[[${regId}]] <a
+									href="#"
+									th:href="@{/Groups/unregisterDeviceFromGroup(id=${group.id},regId=${regId})}"><i
+										class="fa fa-remove"></i></a></li>
+							</ul>
+						</td>
 						<td><a href="#"
-							th:href="@{/Topics/unregisterTopic(url=${topic.url})}"
-							class="btn btn-default btn-sm">Remove</a></td>
+							th:href="@{/Groups/unregisterGroup(id=${group.id})}"
+							class="btn btn-default btn-sm">Remove group</a></td>
 					</tr>
 				</tbody>
 			</table>

@@ -1,5 +1,7 @@
 package gcmserver.controllers;
 
+import java.util.ArrayList;
+
 import gcmserver.controllers.model.GroupViewModel;
 import gcmserver.controllers.model.TopicViewModel;
 import gcmserver.core.DeviceManager;
@@ -97,12 +99,15 @@ public class GroupManagementController {
 		return new ModelAndView("Groups", "modelo", modelo);
 	}
 
-	@RequestMapping(value = "/registerDeviceInGroup", method = RequestMethod.GET)
+	@RequestMapping(value = "/registerDeviceInGroup", method = RequestMethod.POST)
 	protected ModelAndView registerDeviceInGroup(@RequestParam String id,
-			@RequestParam String regId, HttpSession sesion, Model modelo) {
+			@ModelAttribute GroupViewModel newGroup, HttpSession sesion,
+			Model modelo) {
 
 		try {
-			groupMngr.registerDeviceInGroup(id, regId);
+
+			groupMngr.registerDeviceInGroup(newGroup.getId(), newGroup
+					.getRegIds().get(0));
 			// Save to XML file
 			groupMngr.save();
 		} catch (Exception e) {

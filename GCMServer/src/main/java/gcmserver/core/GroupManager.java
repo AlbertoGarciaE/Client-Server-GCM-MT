@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,45 +54,68 @@ public class GroupManager {
 
 	/**
 	 * 
-	 * @param device
+	 * @param notificationKeyName
+	 * @param notificationKey
+	 * @param registrationIds
 	 */
-	public void registerGroup(String id) {
-		Groups.Group group = factory.createGroupsGroup();
-		group.setId(id);
-		group.getRegistrationIdList();
-		groups.getGroupList().add(group);
-		logger.info("Added " + group.toString() + " to list of groups");
+	public void registerGroup(String notificationKeyName,
+			String notificationKey, Map<String, String> registrationIds) {
+		Groups.Group auxGroup = factory.createGroupsGroup();
+		auxGroup.setNotificationKeyName(notificationKeyName);
+		auxGroup.setNotificationKey(notificationKey);
+		groups.getGroupList().add(auxGroup);
+		try {
+
+			HashMap<String, String> regIds = new HashMap<String, String>(
+					registrationIds);
+			for (Map.Entry<String, String> entry : regIds.entrySet()) {
+				if (entry.getValue() != "") {
+					Groups.Group.RegistrationId regId = factory
+							.createGroupsGroupRegistrationId();
+					regId.setName(entry.getKey());
+					regId.setValue(entry.getValue());
+					registerDeviceInGroup(notificationKeyName, notificationKey,
+							regId);
+				}
+			}
+
+		} catch (Exception e) {
+			logger.error("Error during adding registration ids to the new group: "
+					+ e.toString());
+			e.printStackTrace();
+		}
+		logger.info("Added " + auxGroup.toString() + " to list of groups");
 	}
 
 	/**
 	 * 
-	 * @param device
+	 * @param notificationKeyName
+	 * @param notificationKey
 	 */
-	public void unregisterGroup(String id) {
-		Groups.Group group = factory.createGroupsGroup();
-		group.setId(id);
-		group.getRegistrationIdList();
+	public void unregisterGroup(String notificationKeyName,
+			String notificationKey) {
+		Groups.Group group = getGroup(notificationKey);
 		groups.getGroupList().remove(group);
 		logger.info("Removed " + group.toString() + " from list of groups");
 	}
 
 	/**
 	 * 
-	 * @param id
+	 * @param notificationKey
 	 * @param regId
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public void registerDeviceInGroup(String id, String regId) throws Exception {
-		Groups.Group group = factory.createGroupsGroup();
-		group.setId(id);
-		group.getRegistrationIdList();
-		int index = groups.getGroupList().indexOf(group);
-		if (groups.getGroupList().get(index).getRegistrationIdList().size() < GROUP_LIMIT_SIZE) {
-			groups.getGroupList().get(index).getRegistrationIdList().add(regId);
+	public void registerDeviceInGroup(String notificationKeyName,
+			String notificationKey, Groups.Group.RegistrationId regId)
+			throws Exception {
+		Groups.Group group = getGroup(notificationKey);
+
+		if (group.getRegistrationIdList().size() < GROUP_LIMIT_SIZE) {
+			group.getRegistrationIdList().add(regId);
 		} else {
 			throw new Exception("Size limit reached for this group");
 		}
-		logger.info("Added " + regId + " to group " + id);
+		logger.info("Added " + regId + " to group " + group.toString());
 	}
 
 	/**
@@ -98,13 +123,12 @@ public class GroupManager {
 	 * @param id
 	 * @param regId
 	 */
-	public void unregisterDeviceFromGroup(String id, String regId) {
-		Groups.Group group = factory.createGroupsGroup();
-		group.setId(id);
-		group.getRegistrationIdList();
-		int index = groups.getGroupList().indexOf(group);
-		groups.getGroupList().get(index).getRegistrationIdList().remove(regId);
-		logger.info("Removed " + regId + " from group " + id);
+	public void unregisterDeviceFromGroup(String notificationKeyName,
+			String notificationKey, Groups.Group.RegistrationId regId) {
+		Groups.Group group = getGroup(notificationKey);
+		group.getRegistrationIdList().remove(regId);
+		logger.info("Removed " + regId.toString() + " from group "
+				+ group.toString());
 	}
 
 	/**
@@ -196,8 +220,20 @@ public class GroupManager {
 		this.groups.getGroupList().clear();
 	}
 
-	public Groups.Group getNewTopic() {
+	public Groups.Group getNewGroup() {
 		return factory.createGroupsGroup();
+	}
+
+	public Groups.Group.RegistrationId getNewRegistrationId() {
+		return factory.createGroupsGroupRegistrationId();
+	}
+
+	public Groups.Group getGroup(String notificationKey) {
+		Groups.Group auxGroup = factory.createGroupsGroup();
+		auxGroup.setNotificationKeyName("notificationKeyName");
+		auxGroup.setNotificationKey(notificationKey);
+		return this.groups.getGroupList().get(
+				this.groups.getGroupList().indexOf(auxGroup));
 	}
 
 }

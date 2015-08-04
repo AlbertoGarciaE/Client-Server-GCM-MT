@@ -203,15 +203,18 @@ public class Devices {
 		 */
 		@Override
 		public String toString() {
-			StringBuilder builder = new StringBuilder("Device[");
+			StringBuilder builder = new StringBuilder("Device(");
 			if (name != null) {
-				builder.append(" name=").append(name);
+				builder.append("name=").append(name).append(", ");
 			}
 			if (registrationId != null) {
-				builder.append(" registrationId=").append(registrationId);
+				builder.append("registrationId=").append(registrationId)
+						.append(", ");
 			}
-
-			builder.append(" ]");
+			if (builder.charAt(builder.length() - 1) == ' ') {
+				builder.delete(builder.length() - 2, builder.length());
+			}
+			builder.append(")");
 			return builder.toString();
 		}
 

@@ -2,12 +2,10 @@
 // Este archivo ha sido generado por la arquitectura JavaTM para la implantaci�n de la referencia de enlace (JAXB) XML v2.2.8-b130911.1802 
 // Visite <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Todas las modificaciones realizadas en este archivo se perder�n si se vuelve a compilar el esquema de origen. 
-// Generado el: 2015.07.29 a las 04:45:14 PM CEST 
+// Generado el: 2015.08.01 a las 07:06:23 PM CEST 
 //
 
 package gcmserver.model;
-
-import gcmserver.model.Devices.Device;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +16,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
  * <p>
@@ -37,9 +36,18 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="RegistrationId" type="{http://www.w3.org/2001/XMLSchema}int" maxOccurs="20" minOccurs="0"/>
+ *                   &lt;element name="RegistrationId" maxOccurs="20" minOccurs="0">
+ *                     &lt;complexType>
+ *                       &lt;simpleContent>
+ *                         &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+ *                           &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                         &lt;/extension>
+ *                       &lt;/simpleContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
  *                 &lt;/sequence>
- *                 &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                 &lt;attribute name="notificationKey" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                 &lt;attribute name="notificationKeyName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -103,9 +111,18 @@ public class Groups {
 	 *   &lt;complexContent>
 	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
 	 *       &lt;sequence>
-	 *         &lt;element name="RegistrationId" type="{http://www.w3.org/2001/XMLSchema}int" maxOccurs="20" minOccurs="0"/>
+	 *         &lt;element name="RegistrationId" maxOccurs="20" minOccurs="0">
+	 *           &lt;complexType>
+	 *             &lt;simpleContent>
+	 *               &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+	 *                 &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+	 *               &lt;/extension>
+	 *             &lt;/simpleContent>
+	 *           &lt;/complexType>
+	 *         &lt;/element>
 	 *       &lt;/sequence>
-	 *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+	 *       &lt;attribute name="notificationKey" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+	 *       &lt;attribute name="notificationKeyName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
 	 *     &lt;/restriction>
 	 *   &lt;/complexContent>
 	 * &lt;/complexType>
@@ -117,10 +134,12 @@ public class Groups {
 	@XmlType(name = "", propOrder = { "registrationIdList" })
 	public static class Group {
 
-		@XmlElement(name = "RegistrationId", type = Integer.class)
-		protected List<String> registrationIdList;
-		@XmlAttribute(name = "id", required = true)
-		protected String id;
+		@XmlElement(name = "RegistrationId")
+		protected List<Groups.Group.RegistrationId> registrationIdList;
+		@XmlAttribute(name = "notificationKey", required = true)
+		protected String notificationKey;
+		@XmlAttribute(name = "notificationKeyName", required = true)
+		protected String notificationKeyName;
 
 		/**
 		 * Gets the value of the registrationId property.
@@ -141,36 +160,57 @@ public class Groups {
 		 * 
 		 * <p>
 		 * Objects of the following type(s) are allowed in the list
-		 * {@link Integer }
+		 * {@link Groups.Group.RegistrationId }
 		 * 
 		 * 
 		 */
-		public List<String> getRegistrationIdList() {
+		public List<Groups.Group.RegistrationId> getRegistrationIdList() {
 			if (registrationIdList == null) {
-				registrationIdList = new ArrayList<String>(20);
+				registrationIdList = new ArrayList<Groups.Group.RegistrationId>();
 			}
 			return this.registrationIdList;
 		}
 
 		/**
-		 * Obtiene el valor de la propiedad id.
+		 * Obtiene el valor de la propiedad notificationKey.
 		 * 
 		 * @return possible object is {@link String }
 		 * 
 		 */
-		public String getId() {
-			return id;
+		public String getNotificationKey() {
+			return notificationKey;
 		}
 
 		/**
-		 * Define el valor de la propiedad id.
+		 * Define el valor de la propiedad notificationKey.
 		 * 
 		 * @param value
 		 *            allowed object is {@link String }
 		 * 
 		 */
-		public void setId(String value) {
-			this.id = value;
+		public void setNotificationKey(String value) {
+			this.notificationKey = value;
+		}
+
+		/**
+		 * Obtiene el valor de la propiedad notificationKeyName.
+		 * 
+		 * @return possible object is {@link String }
+		 * 
+		 */
+		public String getNotificationKeyName() {
+			return notificationKeyName;
+		}
+
+		/**
+		 * Define el valor de la propiedad notificationKeyName.
+		 * 
+		 * @param value
+		 *            allowed object is {@link String }
+		 * 
+		 */
+		public void setNotificationKeyName(String value) {
+			this.notificationKeyName = value;
 		}
 
 		/*
@@ -182,7 +222,8 @@ public class Groups {
 		public boolean equals(Object objeto) {
 			// If the registrationId is the same, then it should be the same
 			// device
-			return this.id.equals(((Group) objeto).getId());
+			return this.notificationKey.equals(((Group) objeto)
+					.getNotificationKey());
 		}
 
 		/*
@@ -192,17 +233,131 @@ public class Groups {
 		 */
 		@Override
 		public String toString() {
-			StringBuilder builder = new StringBuilder("Group(");
-			if (id != null) {
-				builder.append(" id=").append(id);
+			StringBuilder builder = new StringBuilder("Group( ");
+			if (notificationKeyName != null && !notificationKeyName.isEmpty()) {
+				builder.append("notificationKeyName=")
+						.append(notificationKeyName).append(", ");
 			}
-			if (registrationIdList != null) {
-				builder.append(" registrationId=").append(
-						registrationIdList.toString());
+			if (notificationKey != null && !notificationKey.isEmpty()) {
+				builder.append("notificationKey=").append(notificationKey)
+						.append(", ");
+			}
+			if (registrationIdList != null && !registrationIdList.isEmpty()) {
+				builder.append("registrationId=")
+						.append(registrationIdList.toString()).append(", ");
 			}
 
-			builder.append(" )");
+			if (builder.charAt(builder.length() - 1) == ' ') {
+				builder.delete(builder.length() - 2, builder.length());
+			}
+			builder.append(")");
 			return builder.toString();
+		}
+
+		/**
+		 * <p>
+		 * Clase Java para anonymous complex type.
+		 * 
+		 * <p>
+		 * El siguiente fragmento de esquema especifica el contenido que se
+		 * espera que haya en esta clase.
+		 * 
+		 * <pre>
+		 * &lt;complexType>
+		 *   &lt;simpleContent>
+		 *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+		 *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+		 *     &lt;/extension>
+		 *   &lt;/simpleContent>
+		 * &lt;/complexType>
+		 * </pre>
+		 * 
+		 * 
+		 */
+		@XmlAccessorType(XmlAccessType.FIELD)
+		@XmlType(name = "", propOrder = { "value" })
+		public static class RegistrationId {
+
+			@XmlValue
+			protected String value;
+			@XmlAttribute(name = "name", required = true)
+			protected String name;
+
+			/**
+			 * Obtiene el valor de la propiedad value.
+			 * 
+			 * @return possible object is {@link String }
+			 * 
+			 */
+			public String getValue() {
+				return value;
+			}
+
+			/**
+			 * Define el valor de la propiedad value.
+			 * 
+			 * @param value
+			 *            allowed object is {@link String }
+			 * 
+			 */
+			public void setValue(String value) {
+				this.value = value;
+			}
+
+			/**
+			 * Obtiene el valor de la propiedad name.
+			 * 
+			 * @return possible object is {@link String }
+			 * 
+			 */
+			public String getName() {
+				return name;
+			}
+
+			/**
+			 * Define el valor de la propiedad name.
+			 * 
+			 * @param value
+			 *            allowed object is {@link String }
+			 * 
+			 */
+			public void setName(String value) {
+				this.name = value;
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Object#equals(java.lang.Object)
+			 */
+			@Override
+			public boolean equals(Object objeto) {
+				// If the registrationId is the same, then it should be the same
+				// device
+				return this.value.equals(((RegistrationId) objeto).getValue());
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Object#toString()
+			 */
+			@Override
+			public String toString() {
+				StringBuilder builder = new StringBuilder("RegistrationId( ");
+				if (name != null && !name.isEmpty()) {
+					builder.append("name=").append(name).append(", ");
+				}
+				if (value != null && !value.isEmpty()) {
+					builder.append("value=").append(value).append(", ");
+				}
+
+				if (builder.charAt(builder.length() - 1) == ' ') {
+					builder.delete(builder.length() - 2, builder.length());
+				}
+				builder.append(")");
+				return builder.toString();
+			}
 		}
 
 	}

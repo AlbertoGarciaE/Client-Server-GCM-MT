@@ -23,7 +23,7 @@ import java.io.Serializable;
  * <p>
  * If the message is successfully created, the {@link #getMessageId()} returns
  * the message id and {@link #getErrorCodeName()} returns {@literal null};
- * otherwise, {@link #getMessageId()} returns {@literal null} and 
+ * otherwise, {@link #getMessageId()} returns {@literal null} and
  * {@link #getErrorCodeName()} returns the code of the error.
  *
  * <p>
@@ -34,6 +34,7 @@ import java.io.Serializable;
  * 
  * <p>
  * In a nutshell, the workflow to handle a result is:
+ * 
  * <pre>
  *   - Call {@link #getMessageId()}:
  *     - {@literal null} means error, call {@link #getErrorCodeName()}
@@ -45,79 +46,84 @@ import java.io.Serializable;
  */
 public final class Result implements Serializable {
 
-  private final String messageId;
-  private final String canonicalRegistrationId;
-  private final String errorCode;
+	private final String messageId;
+	private final String canonicalRegistrationId;
+	private final String errorCode;
 
-  public static final class Builder {
+	public static final class Builder {
 
-	  //TODO esta clase vale tambien para los topic menssage results
-    // optional parameters
-    private String messageId;
-    private String canonicalRegistrationId;
-    private String errorCode;
+		// TODO esta clase vale tambien para los topic menssage results
+		// optional parameters
+		private String messageId;
+		private String canonicalRegistrationId;
+		private String errorCode;
 
-    public Builder canonicalRegistrationId(String value) {
-      canonicalRegistrationId = value;
-      return this;
-    }
+		public Builder canonicalRegistrationId(String value) {
+			canonicalRegistrationId = value;
+			return this;
+		}
 
-    public Builder messageId(String value) {
-      messageId = value;
-      return this;
-    }
+		public Builder messageId(String value) {
+			messageId = value;
+			return this;
+		}
 
-    public Builder errorCode(String value) {
-      errorCode = value;
-      return this;
-    }
+		public Builder errorCode(String value) {
+			errorCode = value;
+			return this;
+		}
 
-    public Result build() {
-      return new Result(this);
-    }
-  }
+		public Result build() {
+			return new Result(this);
+		}
+	}
 
-  private Result(Builder builder) {
-    canonicalRegistrationId = builder.canonicalRegistrationId;
-    messageId = builder.messageId;
-    errorCode = builder.errorCode;
-  }
+	private Result(Builder builder) {
+		canonicalRegistrationId = builder.canonicalRegistrationId;
+		messageId = builder.messageId;
+		errorCode = builder.errorCode;
+	}
 
-  /**
-   * Gets the message id, if any.
-   */
-  public String getMessageId() {
-    return messageId;
-  }
+	/**
+	 * Gets the message id, if any.
+	 */
+	public String getMessageId() {
+		return messageId;
+	}
 
-  /**
-   * Gets the canonical registration id, if any.
-   */
-  public String getCanonicalRegistrationId() {
-    return canonicalRegistrationId;
-  }
+	/**
+	 * Gets the canonical registration id, if any.
+	 */
+	public String getCanonicalRegistrationId() {
+		return canonicalRegistrationId;
+	}
 
-  /**
-   * Gets the error code, if any.
-   */
-  public String getErrorCodeName() {
-    return errorCode;
-  }
+	/**
+	 * Gets the error code, if any.
+	 */
+	public String getErrorCodeName() {
+		return errorCode;
+	}
 
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder("[");
-    if (messageId != null) { 
-      builder.append(" messageId=").append(messageId);
-    }
-    if (canonicalRegistrationId != null) {
-      builder.append(" canonicalRegistrationId=")
-          .append(canonicalRegistrationId);
-    }
-    if (errorCode != null) { 
-      builder.append(" errorCode=").append(errorCode);
-    }
-    return builder.append(" ]").toString();
-  }
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder("Result(");
+		if (messageId != null) {
+			builder.append("messageId=").append(messageId).append(", ");
+		}
+		if (canonicalRegistrationId != null) {
+			builder.append("canonicalRegistrationId=")
+					.append(canonicalRegistrationId).append(", ");
+		}
+		if (errorCode != null) {
+			builder.append("errorCode=").append(errorCode).append(", ");
+		}
+		if (builder.charAt(builder.length() - 1) == ' ') {
+			builder.delete(builder.length() - 2, builder.length());
+		}
+
+		builder.append(")");
+		return builder.toString();
+	}
 
 }

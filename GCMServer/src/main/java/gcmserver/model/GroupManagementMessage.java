@@ -4,12 +4,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class GroupResult {
+public final class GroupManagementMessage {
 
 	private String operation;
 	private String notificationKeyName;
 	private String notificationKey;
-	private String errorCode;
 
 	private final Map<String, String> registrationIds;
 
@@ -18,7 +17,6 @@ public class GroupResult {
 		private String operation;
 		private String notificationKeyName;
 		private String notificationKey;
-		private String errorCode;
 
 		private final Map<String, String> registrationIds;
 
@@ -51,30 +49,21 @@ public class GroupResult {
 			return this;
 		}
 
-		/**
-		 * Sets the errorCode property.
-		 */
-		public Builder errorCode(String value) {
-			errorCode = value;
-			return this;
-		}
-
 		public Builder addRegId(String name, String regId) {
 			registrationIds.put(name, regId);
 			return this;
 		}
 
-		public GroupResult build() {
-			return new GroupResult(this);
+		public GroupManagementMessage build() {
+			return new GroupManagementMessage(this);
 		}
 
 	}
 
-	private GroupResult(Builder builder) {
+	private GroupManagementMessage(Builder builder) {
 		operation = builder.operation;
 		notificationKeyName = builder.notificationKeyName;
 		notificationKey = builder.notificationKey;
-		errorCode = builder.errorCode;
 		registrationIds = Collections.unmodifiableMap(builder.registrationIds);
 	}
 
@@ -100,13 +89,6 @@ public class GroupResult {
 	}
 
 	/**
-	 * @return the errorCode
-	 */
-	public String getErrorCode() {
-		return errorCode;
-	}
-
-	/**
 	 * @return the registrationIds
 	 */
 	public Map<String, String> getRegistrationIds() {
@@ -115,7 +97,7 @@ public class GroupResult {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("GroupResult(");
+		StringBuilder builder = new StringBuilder("Message(");
 		if (operation != null) {
 			builder.append("operation=").append(operation).append(", ");
 		}
@@ -127,9 +109,7 @@ public class GroupResult {
 			builder.append("notificationKey=").append(notificationKey)
 					.append(", ");
 		}
-		if (errorCode != null) {
-			builder.append("errorCode=").append(errorCode).append(", ");
-		}
+
 		if (!registrationIds.isEmpty()) {
 			builder.append("registrationIds: {");
 			for (Map.Entry<String, String> entry : registrationIds.entrySet()) {

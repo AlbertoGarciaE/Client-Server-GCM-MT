@@ -78,4 +78,12 @@ public class ObjectFactory {
 	public Groups.Group createGroupsGroup() {
 		return new Groups.Group();
 	}
+
+	/**
+	 * Create an instance of {@link Groups.Group.RegistrationId }
+	 * 
+	 */
+	public Groups.Group.RegistrationId createGroupsGroupRegistrationId() {
+		return new Groups.Group.RegistrationId();
+	}
 }

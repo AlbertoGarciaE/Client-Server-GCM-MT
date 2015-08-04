@@ -175,4 +175,11 @@ public class DeviceManager {
 		return factory.createDevicesDevice();
 	}
 
+	public Devices.Device getDevice(String regId) {
+		Devices.Device auxDevice = factory.createDevicesDevice();
+		auxDevice.setRegistrationId(regId);
+		auxDevice.setName("findMe");
+		return this.devices.getDeviceList().get(
+				this.devices.getDeviceList().indexOf(auxDevice));
+	}
 }

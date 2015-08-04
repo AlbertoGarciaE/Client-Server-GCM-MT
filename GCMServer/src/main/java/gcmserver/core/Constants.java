@@ -220,6 +220,42 @@ public final class Constants {
 	 */
 	public static final Integer GROUP_LIMIT_SIZE = 20;
 
+	/**
+	 * Group operation to create a group for messaging.
+	 */
+	public static final String GROUP_OPERATION_CREATE = "create";
+
+	/**
+	 * Group operation to add a registration id to a group for messaging.
+	 */
+	public static final String GROUP_OPERATION_ADD = "add";
+
+	/**
+	 * Group operation to remove a registration id from a group.
+	 */
+	public static final String GROUP_OPERATION_REMOVE = "remove";
+
+	/**
+	 * End point for group management.
+	 */
+	public static final String GROUP_OPERATION_END_POINT = "https://android.googleapis.com/gcm/notification";
+	/**
+	 * JSON field operation for group management request.
+	 */
+	public static final String GROUP_JSON_OPERATION = "operation";
+	/**
+	 * JSON field notification_key_name for group management request.
+	 */
+	public static final String GROUP_JSON_NOTIFICATION_KEY_NAME = "notification_key_name";
+	/**
+	 * JSON field notification_key for group management request.
+	 */
+	public static final String GROUP_JSON_NOTIFICATION_KEY = "notification_key";
+	/**
+	 * End point for group management.
+	 */
+	public static final String GROUP_JSON_REGISTRATION_IDS = "registration_ids";
+
 	private Constants() {
 		throw new UnsupportedOperationException();
 	}

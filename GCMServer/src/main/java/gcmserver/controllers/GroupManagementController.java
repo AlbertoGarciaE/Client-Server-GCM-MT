@@ -15,7 +15,7 @@ import gcmserver.core.GroupManager;
 import gcmserver.core.TopicManager;
 import gcmserver.model.Devices;
 import gcmserver.model.GroupManagementMessage;
-import gcmserver.model.GroupResult;
+import gcmserver.model.GroupManagementResult;
 import gcmserver.model.Groups;
 import gcmserver.model.ObjectFactory;
 
@@ -97,7 +97,7 @@ public class GroupManagementController {
 		}
 		GroupManagementMessage message = builder.build();
 		try {
-			GroupResult result = groupSender.sendRemoveFromGroup(message);
+			GroupManagementResult result = groupSender.sendRemoveFromGroup(message);
 			groupMngr.unregisterGroup(notificationKeyName, notificationKey);
 			// Save to XML file
 			groupMngr.save();
@@ -139,7 +139,7 @@ public class GroupManagementController {
 		GroupManagementMessage message = builder.build();
 
 		try {
-			GroupResult result = groupSender.sendCreateGroup(message);
+			GroupManagementResult result = groupSender.sendCreateGroup(message);
 			groupMngr.registerGroup(notificatonKeyName,
 					result.getNotificationKey(), result.getRegistrationIds());
 			// Save to XML file
@@ -176,7 +176,7 @@ public class GroupManagementController {
 		GroupManagementMessage message = builder.build();
 
 		try {
-			GroupResult result = groupSender.sendRemoveFromGroup(message);
+			GroupManagementResult result = groupSender.sendRemoveFromGroup(message);
 			Groups.Group.RegistrationId targetRegId = groupMngr
 					.getNewRegistrationId();
 			targetRegId.setName(regIdName);
@@ -229,7 +229,7 @@ public class GroupManagementController {
 		}
 		GroupManagementMessage message = builder.build();
 		try {
-			GroupResult result = groupSender.sendAddToGroup(message);
+			GroupManagementResult result = groupSender.sendAddToGroup(message);
 			Map<String, String> regIdList = message.getRegistrationIds();
 			for (Map.Entry<String, String> entry : regIdList.entrySet()) {
 				Groups.Group.RegistrationId targetRegId = groupMngr

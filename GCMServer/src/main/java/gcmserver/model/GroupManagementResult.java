@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class GroupResult {
+public class GroupManagementResult {
 
 	private String operation;
 	private String notificationKeyName;
@@ -64,13 +64,13 @@ public class GroupResult {
 			return this;
 		}
 
-		public GroupResult build() {
-			return new GroupResult(this);
+		public GroupManagementResult build() {
+			return new GroupManagementResult(this);
 		}
 
 	}
 
-	private GroupResult(Builder builder) {
+	private GroupManagementResult(Builder builder) {
 		operation = builder.operation;
 		notificationKeyName = builder.notificationKeyName;
 		notificationKey = builder.notificationKey;

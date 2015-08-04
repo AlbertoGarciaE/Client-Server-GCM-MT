@@ -187,8 +187,13 @@ public final class Constants {
 	/**
 	 * JSON-only field representing the number of failed messages.
 	 */
-	public static final String JSON_FAILURE = "failure";
+	public static final String JSON_FAILED_REGISTRATION_IDS = "failed_registration_ids";
 
+	/**
+	 * JSON-only field representing the list of failed registration ids in a group message response.
+	 */
+	public static final String JSON_FAILURE = "failure";
+	
 	/**
 	 * JSON-only field representing the number of messages with a canonical
 	 * registration id.

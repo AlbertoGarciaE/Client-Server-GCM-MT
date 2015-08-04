@@ -40,6 +40,8 @@ import static gcmserver.core.Constants.PARAM_TIME_TO_LIVE;
 import static gcmserver.core.Constants.TOKEN_CANONICAL_REG_ID;
 import static gcmserver.core.Constants.TOKEN_ERROR;
 import static gcmserver.core.Constants.TOKEN_MESSAGE_ID;
+import static gcmserver.core.Constants.JSON_FAILED_REGISTRATION_IDS;
+import gcmserver.model.GroupMessageResult;
 import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
@@ -63,6 +65,7 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
@@ -673,8 +676,176 @@ public class Sender {
 			jsonResponse = (JSONObject) parser.parse(responseBody);
 			Long messageId = (Long) jsonResponse.get(JSON_MESSAGE_ID);
 			String error = (String) jsonResponse.get(JSON_ERROR);
-			Result result = new Result.Builder().messageId(messageId.toString())
-					.errorCode(error).build();
+			Result result = new Result.Builder()
+					.messageId(messageId.toString()).errorCode(error).build();
+			return result;
+		} catch (ParseException e) {
+			throw newIoException(responseBody, e);
+		} catch (CustomParserException e) {
+			throw newIoException(responseBody, e);
+		}
+
+	}
+
+	/**
+	 * Sends a message to many devices, retrying in case of unavailability.
+	 *
+	 * <p>
+	 * <strong>Note: </strong> this method uses exponential back-off to retry in
+	 * case of service unavailability and hence could block the calling thread
+	 * for many seconds.
+	 *
+	 * @param message
+	 *            message to be sent.
+	 * @param group
+	 *            topic that target to a group of subscribed devices that will
+	 *            receive the message.
+	 * @param retries
+	 *            number of retries in case of service unavailability errors.
+	 *
+	 * @return combined result of all requests made.
+	 *
+	 * @throws IllegalArgumentException
+	 *             if registrationIds is {@literal null} or empty.
+	 * @throws InvalidRequestException
+	 *             if GCM didn't returned a 200 or 503 status.
+	 * @throws IOException
+	 *             if message could not be sent.
+	 */
+	/*
+	 * Implements the exponential backoff retry and the result interpretation
+	 */
+	public GroupMessageResult sendGroup(Message message, String group,
+			int retries) throws IOException {
+		int attempt = 0;
+		GroupMessageResult result = null;
+		int backoff = BACKOFF_INITIAL_DELAY;
+		boolean tryAgain;
+		do {
+			attempt++;
+			logger.info("Attempt #" + attempt + " to send message " + message
+					+ " to group " + group);
+			result = sendNoRetryGroup(message, group);
+			tryAgain = !result.getfailedRegistrationIds().isEmpty()
+					&& attempt <= retries;
+			if (tryAgain) {
+				int sleepTime = backoff / 2 + random.nextInt(backoff);
+				sleep(sleepTime);
+				if (2 * backoff < MAX_BACKOFF_DELAY) {
+					backoff *= 2;
+				}
+			}
+		} while (tryAgain);
+		if (!result.getfailedRegistrationIds().isEmpty()) {
+			throw new IOException("Could not send message after " + attempt
+					+ " attempts");
+		}
+		return result;
+	}
+
+	/**
+	 * Sends a message without retrying in case of service unavailability. See
+	 * {@link #sendTopic(Message, List, int)} for more info.
+	 *
+	 * @return result if the message was sent successfully, {@literal null} if
+	 *         it failed but could be retried.
+	 *
+	 * @throws IllegalArgumentException
+	 *             if registrationIds is {@literal null} or empty.
+	 * @throws InvalidRequestException
+	 *             if GCM didn't returned a 200 status.
+	 * @throws IOException
+	 *             if there was a JSON parsing error
+	 */
+	/*
+	 * Implements the message send process using HTTP JSON
+	 */
+	private GroupMessageResult sendNoRetryGroup(Message message, String group)
+			throws IOException {
+		if (nonNull(group).isEmpty()) {
+			throw new IllegalArgumentException("Field To cannot be empty");
+		}
+		Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
+		// Set the options field fields
+		setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+		setJsonField(jsonRequest, JSON_PRIORITY, message.getPriority());
+		setJsonField(jsonRequest, JSON_CONTENT_AVAILABLE,
+				message.isContentAvailable());
+		setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
+				message.isDelayWhileIdle());
+		setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+		setJsonField(jsonRequest, JSON_DELIVERY_RECEIPT_REQUESTED,
+				message.isDeliveryReceiptRequested());
+		setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME,
+				message.getRestrictedPackageName());
+		setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
+
+		// Is a single message, we should use the field JSON_TO
+		jsonRequest.put(JSON_TO, group);
+
+		Map<String, String> payload_data = message.getData();
+		if (!payload_data.isEmpty()) {
+			jsonRequest.put(JSON_PAYLOAD_DATA, payload_data);
+		}
+		Map<String, String> payload_notification = message.getNotification();
+		if (!payload_notification.isEmpty()) {
+			jsonRequest.put(JSON_PAYLOAD_NOTIFICATION, payload_notification);
+		}
+		// Generate request body and send
+		String requestBody = JSONValue.toJSONString(jsonRequest);
+		logger.info("JSON request: " + requestBody);
+		HttpURLConnection conn;
+		int status;
+		try {
+			conn = post(GCM_SEND_ENDPOINT, "application/json", requestBody);
+			status = conn.getResponseCode();
+		} catch (IOException e) {
+			logger.error("IOException posting to GCM", e);
+			return null;
+		}
+		// Process the response
+		String responseBody;
+		if (status != 200) {
+			try {
+				responseBody = getAndClose(conn.getErrorStream());
+				logger.info("JSON error response: " + responseBody);
+			} catch (IOException e) {
+				// ignore the exception since it will thrown an
+				// InvalidRequestException
+				// anyways
+				responseBody = "N/A";
+				logger.error("Exception reading response: ", e);
+			}
+			throw new InvalidRequestException(status, responseBody);
+		}
+		// The status is OK 200 so retrieve the body of the response
+		try {
+			responseBody = getAndClose(conn.getInputStream());
+		} catch (IOException e) {
+			logger.error("IOException reading response", e);
+			return null;
+		}
+		logger.info("JSON response: " + responseBody);
+		// Analyze the response
+		JSONParser parser = new JSONParser();
+		JSONObject jsonResponse;
+
+		try {
+			jsonResponse = (JSONObject) parser.parse(responseBody);
+			int success = getNumber(jsonResponse, JSON_SUCCESS).intValue();
+			int failure = getNumber(jsonResponse, JSON_FAILURE).intValue();
+			ArrayList<String> failedRegIds = (ArrayList<String>) jsonResponse
+					.get(JSON_FAILED_REGISTRATION_IDS);
+			GroupMessageResult.Builder builder = new GroupMessageResult.Builder(
+					success, failure);
+			if (failedRegIds != null && !failedRegIds.isEmpty()) {
+				for (String regIdFailed : failedRegIds) {
+					if (regIdFailed != null && !regIdFailed.isEmpty()) {
+						builder.addfailedRegistrationIds(regIdFailed);
+					}
+				}
+			}
+			GroupMessageResult result = builder.build();
 			return result;
 		} catch (ParseException e) {
 			throw newIoException(responseBody, e);
@@ -731,6 +902,18 @@ public class Sender {
 					+ " does not contain a number: " + value);
 		}
 		return (Number) value;
+	}
+
+	private ArrayList getArray(Map<?, ?> json, String field) {
+		Object value = json.get(field);
+		// if (value == null) {
+		// throw new CustomParserException("Missing field: " + field);
+		// }
+		if (!(value instanceof ArrayList)) {
+			throw new CustomParserException("Field " + field
+					+ " does not contain an array: " + value);
+		}
+		return (ArrayList) value;
 	}
 
 	class CustomParserException extends RuntimeException {

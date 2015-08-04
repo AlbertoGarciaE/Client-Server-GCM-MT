@@ -3,12 +3,13 @@ package gcmserver.controllers;
 import gcmserver.controllers.model.MessageViewModel;
 import gcmserver.core.Constants;
 import gcmserver.core.DeviceManager;
+import gcmserver.core.GroupManager;
 import gcmserver.core.Sender;
 import gcmserver.core.TopicManager;
+import gcmserver.model.GroupMessageResult;
 import gcmserver.model.Message;
 import gcmserver.model.MulticastResult;
 import gcmserver.model.Result;
-import gcmserver.model.Topics.Topic;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,10 +50,12 @@ public class NotificationController {
 	private MessageViewModel messagePlain;
 	private MessageViewModel messageJson;
 	private MessageViewModel messageTopic;
+	private MessageViewModel messageGroup;
 	private MessageViewModel messageJsonMulti;
 	private MessageViewModel messageXMPP;
 	private DeviceManager deviceMngr;
 	private TopicManager topicMngr;
+	private GroupManager groupMngr;
 	private static final Executor threadPool = Executors.newFixedThreadPool(5);
 
 	// API key obtained through the Google API Console.
@@ -66,25 +69,32 @@ public class NotificationController {
 		messagePlain = new MessageViewModel();
 		messageJson = new MessageViewModel();
 		messageTopic = new MessageViewModel();
+		messageGroup = new MessageViewModel();
 		messageJsonMulti = new MessageViewModel();
 		messageXMPP = new MessageViewModel();
 		deviceMngr = DeviceManager.getInstance();
 		topicMngr = TopicManager.getInstance();
+		groupMngr = GroupManager.getInstance();
 	}
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public ModelAndView home(Model modelo) {
-		modelo.addAttribute("messagePlain", messagePlain);
-		modelo.addAttribute("messageJson", messageJson);
-		modelo.addAttribute("messageTopic", messageTopic);
-		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageTopic", messageTopic);
+		// modelo.addAttribute("messageGroup", messageGroup);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",
+		// deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("topicList",topicMngr.getTopicsListSnapshot());
+		// modelo.addAttribute("groupList",groupMngr.getGroupListSnapshot());
 		modelo.addAttribute("request", "");
 		modelo.addAttribute("response", "");
-		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		// logger.info("Modelo: " +modelo.toString());
+
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
 	}
 
 	/**
@@ -161,17 +171,19 @@ public class NotificationController {
 		// Logging the status
 		logger.info(status);
 
-		modelo.addAttribute("messagePlain", messagePlain);
-		modelo.addAttribute("messageJson", messageJson);
-		modelo.addAttribute("messageTopic", messageTopic);
-		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageTopic", messageTopic);
+		// modelo.addAttribute("messageGroup", messageGroup);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("topicList",topicMngr.getTopicsListSnapshot());
 		modelo.addAttribute("request", message.toString());
 		modelo.addAttribute("response", result.toString());
-		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		// logger.info("Modelo: " + modelo.toString());
+
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
 	}
 
 	/**
@@ -317,17 +329,19 @@ public class NotificationController {
 
 		logger.info(status);
 
-		modelo.addAttribute("messagePlain", messagePlain);
-		modelo.addAttribute("messageJson", messageJson);
-		modelo.addAttribute("messageTopic", messageTopic);
-		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageTopic", messageTopic);
+		// modelo.addAttribute("messageGroup", messageGroup);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",
+		// deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
 		modelo.addAttribute("request", message.toString());
 		modelo.addAttribute("response", multicastResult.toString());
-		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		// logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
 	}
 
 	/**
@@ -458,17 +472,153 @@ public class NotificationController {
 
 		logger.info(status);
 
-		modelo.addAttribute("messagePlain", messagePlain);
-		modelo.addAttribute("messageJson", messageJson);
-		modelo.addAttribute("messageTopic", messageTopic);
-		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageTopic", messageTopic);
+		// modelo.addAttribute("messageGroup", messageGroup);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",
+		// deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
 		modelo.addAttribute("request", message.toString());
 		modelo.addAttribute("response", result.toString());
-		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		// logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
+	}
+
+	/**
+	 * Send a message to group of devices subscribed to a topic via HTTP using
+	 * JSON
+	 * 
+	 * @param targets
+	 * @param message
+	 * @param sesion
+	 * @param modelo
+	 */
+	@RequestMapping(value = "/groupMessage", method = RequestMethod.POST)
+	protected ModelAndView groupMessage(
+			@ModelAttribute MessageViewModel message, HttpSession sesion,
+			Model modelo) {
+		// Send single http JSON notification
+		// NOTE: a real application
+		// could always send a multicast, even for just one recipient.
+		// Thus if we want to send a single message we pass one device only
+		// The targetList will contain only 1 target since is a single JSON
+		// message
+
+		String targetGroup = message.getTarget();
+		String status;
+		GroupMessageResult groupResult = null;
+		if (targetGroup.isEmpty()) {
+			status = "Message ignored as there is no target group!";
+		} else {
+			final Message.Builder messageBuilder = new Message.Builder();
+			String collapseKey = message.getCollapseKey();
+			if (!collapseKey.isEmpty()) {
+				messageBuilder.collapseKey(collapseKey.trim());
+			}
+
+			String restrictedPackageName = message.getRestrictedPackageName();
+			if (!restrictedPackageName.isEmpty()) {
+				messageBuilder.restrictedPackageName(restrictedPackageName
+						.trim());
+			}
+
+			Integer timeToLive = message.getTimeToLive();
+			if (timeToLive != null) {
+				messageBuilder.timeToLive(timeToLive);
+			}
+
+			Integer prority = message.getPriority();
+			if (prority != null) {
+				messageBuilder.priority(prority);
+			}
+
+			Boolean delayWhileIdle = message.getDelayWhileIdle();
+			if (delayWhileIdle != null) {
+				messageBuilder.delayWhileIdle(delayWhileIdle);
+			}
+
+			Boolean dryRun = message.getDryRun();
+			if (dryRun != null) {
+				messageBuilder.dryRun(dryRun);
+			}
+
+			Boolean contentAvailable = message.getContentAvailable();
+			if (contentAvailable != null) {
+				messageBuilder.contentAvailable(contentAvailable);
+			}
+
+			if (message.getEnableNotification()) {
+				HashMap<String, String> noti = new HashMap<String, String>(
+						message.getNotification());
+				for (Map.Entry<String, String> entry : noti.entrySet()) {
+					if (entry.getValue() != "") {
+						messageBuilder.addNotification(entry.getKey(),
+								entry.getValue());
+					}
+				}
+
+			}
+
+			// Convert the json string stored in data to a HashMap and build
+			// data in message class
+			String data = message.getData();
+			if (!data.isEmpty()) {
+				Map<String, String> mapData = new HashMap<String, String>();
+				ObjectMapper mapper = new ObjectMapper();
+				try {
+					// convert JSON string to Map
+					mapData = mapper.readValue(data,
+							new TypeReference<HashMap<String, String>>() {
+							});
+					for (Map.Entry<String, String> entry : mapData.entrySet()) {
+						if (entry.getValue() != "") {
+							messageBuilder.addData(entry.getKey(),
+									entry.getValue());
+						}
+					}
+				} catch (Exception e) {
+					logger.error("Error while creating HasMap from data string "
+							+ e.toString());
+					e.printStackTrace();
+				}
+			}
+
+			// Send the message to the target device
+			try {
+				groupResult = sender.sendGroup(messageBuilder.build(),
+						targetGroup, 5);
+
+				if (groupResult.getfailedRegistrationIds().isEmpty()) {
+					logger.info("Succesfully sent message to group: "
+							+ targetGroup);
+				}
+
+			} catch (IOException e) {
+				logger.error("Error posting messages", e);
+			}
+
+		}
+
+		status = "Message sent to device";
+
+		logger.info(status);
+
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageTopic", messageTopic);
+		// modelo.addAttribute("messageGroup", messageGroup);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",
+		// deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+		modelo.addAttribute("request", message.toString());
+		modelo.addAttribute("response", groupResult.toString());
+		// logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
 	}
 
 	/**
@@ -542,15 +692,16 @@ public class NotificationController {
 					+ " multicast messages to " + total + " devices";
 		}
 		logger.info(status);
-		modelo.addAttribute("messagePlain", messagePlain);
-		modelo.addAttribute("messageJson", messageJson);
-		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		modelo.addAttribute("messageXMPP", messageXMPP);
-		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
-		modelo.addAttribute("request", message.toString());
-		modelo.addAttribute("response", status.toString());
-		logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", modelo);
+		// modelo.addAttribute("messagePlain", messagePlain);
+		// modelo.addAttribute("messageJson", messageJson);
+		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		// modelo.addAttribute("messageXMPP", messageXMPP);
+		// modelo.addAttribute("deviceList",
+		// deviceMngr.getdeviceListSnapshot());
+		// modelo.addAttribute("request", message.toString());
+		// modelo.addAttribute("response", status.toString());
+		// logger.info("Modelo: " + modelo.toString());
+		return new ModelAndView("Notifications", "modelo", createModel(modelo));
 	}
 
 	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.POST)
@@ -617,4 +768,17 @@ public class NotificationController {
 		});
 	}
 
+	private Model createModel(Model modelo) {
+		modelo.addAttribute("messagePlain", messagePlain);
+		modelo.addAttribute("messageJson", messageJson);
+		modelo.addAttribute("messageTopic", messageTopic);
+		modelo.addAttribute("messageGroup", messageGroup);
+		modelo.addAttribute("messageJsonMulti", messageJsonMulti);
+		modelo.addAttribute("messageXMPP", messageXMPP);
+		modelo.addAttribute("deviceList", deviceMngr.getdeviceListSnapshot());
+		modelo.addAttribute("topicList", topicMngr.getTopicsListSnapshot());
+		modelo.addAttribute("groupList", groupMngr.getGroupListSnapshot());
+		logger.info("Modelo: " + modelo.toString());
+		return modelo;
+	}
 }

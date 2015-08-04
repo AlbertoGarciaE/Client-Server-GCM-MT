@@ -17,8 +17,8 @@ package gcmserver.core;
 
 import static gcmserver.core.Constants.*;
 import gcmserver.model.GroupManagementMessage;
-import gcmserver.model.GroupResult;
-import gcmserver.model.GroupResult.Builder;
+import gcmserver.model.GroupManagementResult;
+import gcmserver.model.GroupManagementResult.Builder;
 import gcmserver.model.Message;
 
 import java.io.BufferedReader;
@@ -87,18 +87,18 @@ public class GroupManagementSender {
 	/*
 	 * Implements the message send process using HTTP JSON
 	 */
-	public GroupResult sendCreateGroup(GroupManagementMessage message)
+	public GroupManagementResult sendCreateGroup(GroupManagementMessage message)
 			throws IOException {
 		return sendOperationGroup(message, GROUP_OPERATION_CREATE);
 
 	}
 
-	public GroupResult sendAddToGroup(GroupManagementMessage message)
+	public GroupManagementResult sendAddToGroup(GroupManagementMessage message)
 			throws IOException {
 		return sendOperationGroup(message, GROUP_OPERATION_ADD);
 	}
 
-	public GroupResult sendRemoveFromGroup(GroupManagementMessage message)
+	public GroupManagementResult sendRemoveFromGroup(GroupManagementMessage message)
 			throws IOException {
 		return sendOperationGroup(message, GROUP_OPERATION_REMOVE);
 	}
@@ -120,7 +120,7 @@ public class GroupManagementSender {
 	/*
 	 * Implements the message send process using HTTP JSON
 	 */
-	private GroupResult sendOperationGroup(GroupManagementMessage message,
+	private GroupManagementResult sendOperationGroup(GroupManagementMessage message,
 			String operation) throws IOException {
 		if (nonNull(message.getNotificationKeyName()).isEmpty()) {
 			throw new IllegalArgumentException(
@@ -187,7 +187,7 @@ public class GroupManagementSender {
 
 		try {
 			jsonResponse = (JSONObject) parser.parse(responseBody);
-			Builder result = new GroupResult.Builder();
+			Builder result = new GroupManagementResult.Builder();
 			result.notificationKeyName(message.getNotificationKeyName());
 			String notificationKey = (String) jsonResponse
 					.get(GROUP_JSON_NOTIFICATION_KEY);

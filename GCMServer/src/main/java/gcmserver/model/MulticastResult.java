@@ -140,7 +140,7 @@ public final class MulticastResult implements Serializable {
 				.append("failure=").append(failure).append(", ")
 				.append("canonical_ids=").append(canonicalIds).append(", ");
 		if (!results.isEmpty()) {
-			builder.append("results: " + results.toString());
+			builder.append("results: " + results.toString()).append(", ");
 		}
 		if (builder.charAt(builder.length() - 1) == ' ') {
 			builder.delete(builder.length() - 2, builder.length());

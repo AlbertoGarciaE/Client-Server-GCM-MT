@@ -66,10 +66,23 @@ $('document')
 					function saveEditor2() {
 						var json = editor2.get();
 						var text = JSON.stringify(json)
-						$("#form_topic_message textarea#input_payload_data").val(
-								text);
+						$("#form_topic_message textarea#input_payload_data")
+								.val(text);
 					}
 
+					// set empty json
+					function clearEditor3() {
+						var json = {};
+						editor2.set(json);
+					}
+
+					// get json and parse to textarea
+					function saveEditor3() {
+						var json = editor3.get();
+						var text = JSON.stringify(json)
+						$("#form_group_message textarea#input_payload_data")
+								.val(text);
+					}
 					function addPlainDataField() {
 						var text = $(
 								"#form_http_plain textarea#input_payload_data")
@@ -88,18 +101,37 @@ $('document')
 
 					// Init color picker for JSON simple message
 					$('.demo2').colorpicker();
+
 					// JSON editor
 					// create the editor
 					var container = document
 							.getElementById("dataEditorJsonSingle");
 					var editor = new JSONEditor(container);
+
 					var container2 = document
-							.getElementById("dataEditorTopicMEssage");
+							.getElementById("dataEditorTopicMessage");
 					var editor2 = new JSONEditor(container2);
-					$("#form_topic_message #btn_clear_dataEditor").on("click", clearEditor2);
-					$("#form_topic_message #btn_save_dataEditor").on("click", saveEditor2);
-					$("#form_http_json #btn_clear_dataEditor").on("click", clearEditor);
-					$("#form_http_json #btn_save_dataEditor").on("click", saveEditor);
+
+					var container3 = document
+							.getElementById("dataEditorGroupMessage");
+					var editor3 = new JSONEditor(container3);
+
+					// Link handler to the buttons
+					$("#form_group_message #btn_clear_dataEditor").on("click",
+							clearEditor3);
+					$("#form_group_message #btn_save_dataEditor").on("click",
+							saveEditor3);
+
+					$("#form_topic_message #btn_clear_dataEditor").on("click",
+							clearEditor2);
+					$("#form_topic_message #btn_save_dataEditor").on("click",
+							saveEditor2);
+
+					$("#form_http_json #btn_clear_dataEditor").on("click",
+							clearEditor);
+					$("#form_http_json #btn_save_dataEditor").on("click",
+							saveEditor);
+
 					$("#form_http_plain #btn_add_plain_data_field").on("click",
 							addPlainDataField);
 

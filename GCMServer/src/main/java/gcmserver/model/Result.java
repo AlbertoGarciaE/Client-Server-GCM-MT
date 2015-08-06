@@ -44,6 +44,7 @@ import java.io.Serializable;
  *         - otherwise, update the server datastore with the new id.
  * </pre>
  */
+// This class is valid to represent Single Json or Plain Text result and also Topics results
 public final class Result implements Serializable {
 
 	private final String messageId;
@@ -52,7 +53,6 @@ public final class Result implements Serializable {
 
 	public static final class Builder {
 
-		// TODO esta clase vale tambien para los topic menssage results
 		// optional parameters
 		private String messageId;
 		private String canonicalRegistrationId;

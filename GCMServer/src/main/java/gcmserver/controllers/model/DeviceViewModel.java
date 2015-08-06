@@ -6,30 +6,6 @@ public class DeviceViewModel {
 	private String registrationId;
 
 	/**
-	 * 
-	 */
-	public DeviceViewModel() {
-
-	}
-
-	/**
-	 * 
-	 */
-	public DeviceViewModel(DeviceViewModel deviceViewModel) {
-		this.name = new String(deviceViewModel.getName());
-		this.registrationId = new String(deviceViewModel.getRegistrationId());
-	}
-
-	/**
-	 * @param name
-	 * @param registrationId
-	 */
-	public DeviceViewModel(String name, String registrationId) {
-		this.name = new String(name);
-		this.registrationId = new String(registrationId);
-	}
-
-	/**
 	 * @return the name
 	 */
 	public String getName() {
@@ -59,34 +35,27 @@ public class DeviceViewModel {
 		this.registrationId = registrationId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object objeto) {
 		// If the registrationId is the same, then it should be the same device
-		return this.registrationId
-				.equals(((DeviceViewModel) objeto).getRegistrationId());
+		return this.registrationId.equals(((DeviceViewModel) objeto)
+				.getRegistrationId());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("Device[");
+		StringBuilder builder = new StringBuilder("Device(");
 		if (name != null) {
-			builder.append(" name=").append(name);
+			builder.append("name=").append(name).append(", ");
 		}
 		if (registrationId != null) {
-			builder.append(" registrationId=").append(registrationId);
+			builder.append("registrationId=").append(registrationId)
+					.append(", ");
 		}
-
-		builder.append(" ]");
+		if (builder.charAt(builder.length() - 1) == ' ') {
+			builder.delete(builder.length() - 2, builder.length());
+		}
+		builder.append(")");
 		return builder.toString();
 	}
 

@@ -1,15 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Topics>
-    <Topic>
-        <Name>Football</Name>
-        <url>/topics/football</url>
-    </Topic>
-    <Topic>
-        <Name>Baseball</Name>
-        <url>/topics/baseball</url>
-    </Topic>
-    <Topic>
-        <Name>Basketball</Name>
-        <url>/topics/basketball</url>
-    </Topic>
-</Topics>
+<Topics/>

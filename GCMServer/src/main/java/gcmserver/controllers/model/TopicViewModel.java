@@ -6,30 +6,6 @@ public class TopicViewModel {
 	private String url;
 
 	/**
-	 * 
-	 */
-	public TopicViewModel() {
-
-	}
-
-	/**
-	 * 
-	 */
-	public TopicViewModel(TopicViewModel topicViewModel) {
-		this.name = new String(topicViewModel.getName());
-		this.url = new String(topicViewModel.getUrl());
-	}
-
-	/**
-	 * @param name
-	 * @param url
-	 */
-	public TopicViewModel(String name, String url) {
-		this.name = new String(name);
-		this.url = new String(url);
-	}
-
-	/**
 	 * @return the name
 	 */
 	public String getName() {
@@ -59,22 +35,19 @@ public class TopicViewModel {
 		this.url = url;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("Topic[");
+		StringBuilder builder = new StringBuilder("Topic(");
 		if (name != null) {
-			builder.append(" name=").append(name);
+			builder.append("name=").append(name).append(", ");
 		}
 		if (url != null) {
-			builder.append(" url=").append(url);
+			builder.append("url=").append(url).append(", ");
 		}
-
-		builder.append(" ]");
+		if (builder.charAt(builder.length() - 1) == ' ') {
+			builder.delete(builder.length() - 2, builder.length());
+		}
+		builder.append(")");
 		return builder.toString();
 	}
 

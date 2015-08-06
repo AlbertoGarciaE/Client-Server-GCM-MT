@@ -118,7 +118,7 @@ public final class MulticastResult implements Serializable {
 	}
 
 	/**
-	 * Gets the results of each individual message, which is immutable.
+	 * Gets the list of results of each individual message, which is immutable.
 	 */
 	public List<Result> getResults() {
 		return results;
@@ -133,12 +133,12 @@ public final class MulticastResult implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder("MulticastResult(")
-				.append("multicast_id=").append(multicastId).append(", ")
-				.append("total=").append(getTotal()).append(", ")
-				.append("success=").append(success).append(", ")
-				.append("failure=").append(failure).append(", ")
-				.append("canonical_ids=").append(canonicalIds).append(", ");
+		StringBuilder builder = new StringBuilder("MulticastResult(");
+		builder.append("multicast_id=").append(multicastId).append(", ");
+		builder.append("total=").append(getTotal()).append(", ");
+		builder.append("success=").append(success).append(", ");
+		builder.append("failure=").append(failure).append(", ");
+		builder.append("canonical_ids=").append(canonicalIds).append(", ");
 		if (!results.isEmpty()) {
 			builder.append("results: " + results.toString()).append(", ");
 		}

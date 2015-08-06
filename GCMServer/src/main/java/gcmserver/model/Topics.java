@@ -7,8 +7,6 @@
 
 package gcmserver.model;
 
-import gcmserver.model.Devices.Device;
-
 import java.util.ArrayList;
 import java.util.List;
 

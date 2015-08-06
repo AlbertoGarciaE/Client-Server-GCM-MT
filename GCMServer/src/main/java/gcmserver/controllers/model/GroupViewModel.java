@@ -54,11 +54,6 @@ public class GroupViewModel {
 		this.regIds = regIds;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Group(");

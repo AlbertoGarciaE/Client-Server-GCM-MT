@@ -53,24 +53,26 @@ public class DeviceManager {
 	 * 
 	 * @param device
 	 */
-	public void registerDevice(String name, String regId) {
+	public Boolean registerDevice(String name, String regId) {
 		Devices.Device device = factory.createDevicesDevice();
 		device.setName(name);
 		device.setRegistrationId(regId);
-		devices.getDeviceList().add(device);
+		Boolean succes = devices.getDeviceList().add(device);
 		logger.info("Added " + device.toString() + " to list of devices");
+		return succes;
 	}
 
 	/**
 	 * 
 	 * @param device
 	 */
-	public void unregisterDevice(String regId) {
+	public Boolean unregisterDevice(String regId) {
 		Devices.Device device = factory.createDevicesDevice();
 		device.setName("erase");
 		device.setRegistrationId(regId);
-		devices.getDeviceList().remove(device);
+		Boolean succes = devices.getDeviceList().remove(device);
 		logger.info("Removed " + device.toString() + " from list of devices");
+		return succes;
 	}
 
 	/**

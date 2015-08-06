@@ -36,15 +36,7 @@ public final class MessageViewModel {
 	private Boolean deliveryReceiptRequested;
 	private String restrictedPackageName;
 	private Boolean dryRun;
-	// Notification parameters
 	private boolean enableNotification;
-	/*
-	 * private String notificationTitle; private String notificationBody;
-	 * private String notificationIcon; private String notificationSound;
-	 * private String notificationTag; private String notificationColor; private
-	 * String notificationClickAction;
-	 */
-
 	private String data;
 	private Map<String, String> notification;
 

@@ -2,46 +2,45 @@ $('document')
 		.ready(
 				function() {
 
-					$('#input_notification')
-							.change(
-									function() {
-										if ($('#input_notification').is(
-												':checked') == true) {
-											$('#input_notification_title')
-													.prop('disabled', false);
-											$('#input_notification_body').prop(
-													'disabled', false);
-											$('#input_notification_icon').prop(
-													'disabled', false);
-											$('#input_notification_sound')
-													.prop('disabled', false);
-											$('#input_notification_tag').prop(
-													'disabled', false);
-											$('#input_notification_color')
-													.prop('disabled', false);
-											$(
-													'#input_notification_click_action')
-													.prop('disabled', false);
-											console.log('checked');
-										} else {
-											$('#input_notification_title')
-													.prop('disabled', true);
-											$('#input_notification_body').prop(
-													'disabled', true);
-											$('#input_notification_icon').prop(
-													'disabled', true);
-											$('#input_notification_sound')
-													.prop('disabled', true);
-											$('#input_notification_tag').prop(
-													'disabled', true);
-											$('#input_notification_color')
-													.prop('disabled', true);
-											$(
-													'#input_notification_click_action')
-													.prop('disabled', true);
-											console.log('unchecked');
-										}
-									});
+					$('input[name=enableNotification]').change(
+							function(event) {
+								var id = event.target;
+								var form = event.target.form;
+								if ($('#' + form.id + ' #' + id.id).is(
+										':checked') == true) {
+									$('#' + form.id +' #input_notification_title').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_body').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_icon').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_sound').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_tag').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_color').prop(
+											'disabled', false);
+									$('#' + form.id +' #input_notification_click_action').prop(
+											'disabled', false);
+									console.log('checked');
+								} else {
+									$('#' + form.id +' #input_notification_title').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_body').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_icon').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_sound').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_tag').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_color').prop(
+											'disabled', true);
+									$('#' + form.id +' #input_notification_click_action').prop(
+											'disabled', true);
+									console.log('unchecked');
+								}
+							});
 
 					// set empty json
 					function clearEditor() {

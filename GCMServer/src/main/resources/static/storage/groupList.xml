@@ -1,18 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Groups>
-	<Group notificationKey="qwerty12345" notificationKeyName="group1">
-		<RegistrationId name="will">0169485324</RegistrationId>
-		<RegistrationId name="smith">0169ohfbgvkjfebv24
-		</RegistrationId>
-	</Group>
-	<Group notificationKey="nbv456" notificationKeyName="group2">
-		<RegistrationId name="will">0169485324</RegistrationId>
-		<RegistrationId name="smith">0169ohfbgvkjfebv24
-		</RegistrationId>
-	</Group>
-	<Group notificationKey="feojvorenv0944355" notificationKeyName="group3">
-		<RegistrationId name="will">0169485324</RegistrationId>
-		<RegistrationId name="smith">0169ohfbgvkjfebv24
-		</RegistrationId>
-	</Group>
-</Groups>
+<Groups/>

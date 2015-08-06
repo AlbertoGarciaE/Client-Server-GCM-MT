@@ -34,7 +34,6 @@
 		</div>
 		<ul class="nav navbar-nav">
 			<li class="active"><a href="#" th:href="@{/Notification/}">Downstream</a></li>
-			<li><a href="#">Upstream</a></li>
 			<li><a href="#" th:href="@{/Groups/}">Groups</a></li>
 			<li><a href="#" th:href="@{/Topics/}">Topics</a></li>
 			<li><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
@@ -59,12 +58,6 @@
 					<li role="presentation"><a href=""
 						data-target="#group_message" aria-controls="group_message"
 						role="tab" data-toggle="tab" class="">Group message</a></li>
-					<li role="presentation"><a href=""
-						data-target="#http_json_multi" aria-controls="http_json_multi"
-						role="tab" data-toggle="tab" class="">HTTP JSON Multi</a></li>
-					<li role="presentation"><a href="" data-target="#xmpp"
-						aria-controls="xmpp" role="tab" data-toggle="tab" class="">XMPP</a>
-					</li>
 				</ul>
 				<div class="tab-content">
 					<!-- Tab HTTP PLAIN TEXT -->
@@ -291,7 +284,7 @@
 												<div class="col-lg-8">
 													<div class="checkbox">
 														<label> <input type="checkbox"
-															id="input_notification" th:field="*{enableNotification}"></input>Check
+															id="input_notification" name="enableNotification" th:field="*{enableNotification}"></input>Check
 															/ Uncheck
 														</label>
 													</div>
@@ -533,7 +526,7 @@
 												<div class="col-lg-8">
 													<div class="checkbox">
 														<label> <input type="checkbox"
-															id="input_notification" th:field="*{enableNotification}"></input>Check
+															id="input_notification" name="enableNotification" th:field="*{enableNotification}"></input>Check
 															/ Uncheck
 														</label>
 													</div>
@@ -777,7 +770,7 @@
 												<div class="col-lg-8">
 													<div class="checkbox">
 														<label> <input type="checkbox"
-															id="input_notification" th:field="*{enableNotification}"></input>Check
+															id="input_notification" name="enableNotification" th:field="*{enableNotification}"></input>Check
 															/ Uncheck
 														</label>
 													</div>
@@ -903,251 +896,6 @@
 						</form>
 					</div>
 					<!-- END Tab Group message-->
-					<!-- Tab HTTP JSON Multi -->
-					<div role="tabpanel" class="tab-pane" id="http_json_multi">
-						<h2>HTTP JSON Multi</h2>
-						<p>From to create a GCM notification for multiple devices
-							using HTTP and JSON format</p>
-						<form id="form_http_json_multi" class="form-horizontal"
-							role="form" action="#"
-							th:action="@{/Notification/notificationHttpJsonMulti}"
-							th:object="${messageJsonMulti}" method="post">
-							<h3>Target</h3>
-							<div class="form-group required">
-								<label for="input_registration_ids"
-									class="col-lg-4 control-label">registration_ids</label>
-								<div class="col-lg-8">
-									<select class="form-control" id="input_registration_ids"
-										required="" multiple="" th:field="*{listTargets}">
-										<option value="">Select one...</option>
-										<option th:each="device : ${deviceList}"
-											th:value="${device.registrationId}" th:text="${device.name}"
-											value="Uno">Uno</option>
-									</select>
-								</div>
-							</div>
-							<h3>Options</h3>
-							<div class="form-group">
-								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
-								<div class="col-lg-8">
-									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}"></input>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_priority" class="col-lg-4 control-label">priority</label>
-								<div class="col-lg-8">
-									<input type="number" max="10" min="0" class="form-control"
-										id="input_priority" placeholder="priority"
-										th:field="*{priority}"></input>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_content_available"
-									class="col-lg-4 control-label">content_available</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox"
-											id="input_content_available" th:field="*{contentAvailable}"></input>Check
-											/ Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_delay_while_idle"
-									class="col-lg-4 control-label">delay_while_idle</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
-											/ Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_time_to_live" class="col-lg-4 control-label">time_to_live</label>
-								<div class="col-lg-8">
-									<div class="input-group">
-										<input type="number" max="2419200" min="0"
-											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
-											class="input-group-addon">sec</span>
-									</div>
-									<p id="helpBlock" class="help-block">This parameter
-										specifies how long (in seconds) the message should be kept in
-										GCM storage if the device is offline. The maximum time to live
-										supported is 4 weeks.</p>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_restricted_package_name"
-									class="col-lg-4 control-label">restricted_package_name</label>
-								<div class="col-lg-8">
-									<input type="text" class="form-control"
-										id="input_restricted_package_name"
-										placeholder="restricted_package_name"
-										th:field="*{restrictedPackageName}"></input>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_dry_run" class="col-lg-4 control-label">dry_run</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}"></input>Check / Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<h3>Payload</h3>
-							<div class="form-group">
-								<label for="input_payload_notification"
-									class="col-lg-4 control-label">notification</label>
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3"
-										id="input_payload_notification"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_payload_data" class="col-lg-4 control-label">data</label>
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3" id="input_payload_data"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-lg-offset-6 col-lg-6">
-									<input type="submit" class="btn btn-default" value="Send"></input>
-									<input type="reset" class="btn btn-default" value="Clear"></input>
-								</div>
-							</div>
-						</form>
-					</div>
-					<!-- END Tab HTTP JSON Multi-->
-					<!-- Tab XMPP -->
-					<div role="tabpanel" class="tab-pane" id="xmpp">
-						<h2>XMPP</h2>
-						<p>From to create a GCM notification using XMPP</p>
-						<form id="form_xmpp" class="form-horizontal" role="form"
-							action="#" th:action="@{/Notification/notificationXMPP}"
-							th:object="${messageXMPP}" method="post">
-							<h3>Target</h3>
-							<div class="form-group required">
-								<label for="input_to" class="col-lg-4 control-label">to</label>
-								<div class="col-lg-8">
-									<select class="form-control" id="input_to" required=""
-										th:field="*{target}">
-										<option value="">Select one...</option>
-										<option th:each="device : ${deviceList}"
-											th:value="${device.registrationId}" th:text="${device.name}"
-											value="Uno">Uno</option>
-									</select>
-								</div>
-							</div>
-							<h3>Options</h3>
-							<div class="form-group">
-								<label for="input_collapse_key" class="col-lg-4 control-label">collapse_key</label>
-								<div class="col-lg-8">
-									<input type="text" class="form-control" id="input_collapse_key"
-										placeholder="collapse_key" th:field="*{collapseKey}"></input>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_priority" class="col-lg-4 control-label">priority</label>
-								<div class="col-lg-8">
-									<input type="number" max="10" min="0" class="form-control"
-										id="input_priority" placeholder="priority"
-										th:field="*{priority}"></input>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_content_available"
-									class="col-lg-4 control-label">content_available</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox"
-											id="input_content_available" th:field="*{contentAvailable}"></input>Check
-											/ Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_delay_while_idle"
-									class="col-lg-4 control-label">delay_while_idle</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox"
-											id="input_delay_while_idle" th:field="*{delayWhileIdle}"></input>Check
-											/ Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_time_to_live" class="col-lg-4 control-label">time_to_live</label>
-								<div class="col-lg-8">
-									<div class="input-group">
-										<input type="number" max="2419200" min="0"
-											class="form-control" id="input_time_to_live"
-											placeholder="time_to_live" th:field="*{timeToLive}"></input><span
-											class="input-group-addon">sec</span>
-									</div>
-									<p id="helpBlock" class="help-block">This parameter
-										specifies how long (in seconds) the message should be kept in
-										GCM storage if the device is offline. The maximum time to live
-										supported is 4 weeks.</p>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_delivery_receipt_requested"
-									class="col-lg-4 control-label">delivery_receipt_requested</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox"
-											id="input_delivery_receipt_requested"
-											th:field="*{deliveryReceiptRequested}"></input>Check /
-											Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_dry_run" class="col-lg-4 control-label">dry_run</label>
-								<div class="col-lg-8">
-									<div class="checkbox">
-										<label> <input type="checkbox" id="input_dry_run"
-											th:field="*{dryRun}"></input>Check / Uncheck
-										</label>
-									</div>
-								</div>
-							</div>
-							<h3>Payload</h3>
-							<div class="form-group">
-								<label for="input_payload_notification"
-									class="col-lg-4 control-label">notification</label>
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3"
-										id="input_payload_notification"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<label for="input_payload_data" class="col-lg-4 control-label">data</label>
-
-								<div class="col-lg-8">
-									<textarea class="form-control" rows="3" id="input_payload_data"></textarea>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-lg-offset-6 col-lg-6">
-									<input type="submit" class="btn btn-default" value="Send"></input>
-									<input type="reset" class="btn btn-default" value="Clear"></input>
-								</div>
-							</div>
-						</form>
-					</div>
-					<!-- END Tab XMPP -->
 				</div>
 			</div>
 			<!-- /bootstrap tabs -->

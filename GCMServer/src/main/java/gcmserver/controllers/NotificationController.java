@@ -38,7 +38,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
-@RequestMapping("/Notification")
 public class NotificationController {
 
 	private final Logger logger = LoggerFactory
@@ -106,7 +105,7 @@ public class NotificationController {
 	 * @param modelo
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/notificationHttpPlain", method = RequestMethod.POST)
+	@RequestMapping(value = "/Notification/notificationHttpPlain", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpPlain(
 			@ModelAttribute MessageViewModel message, HttpSession sesion,
 			Model modelo) throws IOException {
@@ -194,7 +193,7 @@ public class NotificationController {
 	 * @param sesion
 	 * @param modelo
 	 */
-	@RequestMapping(value = "/notificationHttpJson", method = RequestMethod.POST)
+	@RequestMapping(value = "/Notification/notificationHttpJson", method = RequestMethod.POST)
 	protected ModelAndView notificationHttpJson(
 			@ModelAttribute MessageViewModel message, HttpSession sesion,
 			Model modelo) {
@@ -353,7 +352,7 @@ public class NotificationController {
 	 * @param sesion
 	 * @param modelo
 	 */
-	@RequestMapping(value = "/topicMessage", method = RequestMethod.POST)
+	@RequestMapping(value = "/Notification/topicMessage", method = RequestMethod.POST)
 	protected ModelAndView topicMessage(
 			@ModelAttribute MessageViewModel message, HttpSession sesion,
 			Model modelo) {
@@ -496,7 +495,7 @@ public class NotificationController {
 	 * @param sesion
 	 * @param modelo
 	 */
-	@RequestMapping(value = "/groupMessage", method = RequestMethod.POST)
+	@RequestMapping(value = "/Notification/groupMessage", method = RequestMethod.POST)
 	protected ModelAndView groupMessage(
 			@ModelAttribute MessageViewModel message, HttpSession sesion,
 			Model modelo) {
@@ -619,153 +618,6 @@ public class NotificationController {
 		modelo.addAttribute("response", groupResult.toString());
 		// logger.info("Modelo: " + modelo.toString());
 		return new ModelAndView("Notifications", "modelo", createModel(modelo));
-	}
-
-	/**
-	 * Send a message to multiples targets via HTTP using JSON
-	 * 
-	 * @param targets
-	 * @param message
-	 * @param sesion
-	 * @param modelo
-	 */
-	@RequestMapping(value = "/notificationHttpJsonMulti", method = RequestMethod.POST)
-	protected ModelAndView notificationHttpJsonMulti(
-			@ModelAttribute MessageViewModel message, HttpSession sesion,
-			Model modelo) {
-		/*
-		 * TODO Send http JSON notification to multiple devices. DEPRECATED
-		 */
-		List<String> targetList = message.getListTargets();
-		String status;
-		if (targetList.isEmpty()) {
-			status = "Message ignored as there is no target devices!";
-		} else {
-			// send a multicast or single message using JSON
-			// NOTE: a real application
-			// could always send a multicast, even for just one recipient.
-			// Thus if we want to send a single message we pass one device only
-			// If we are sending a multicast message using JSON
-			// we must split in chunks of 1000 devices due to GCM limit
-
-			// Build message
-			final Message.Builder messageBuilder = new Message.Builder();
-			String collapseKey = message.getCollapseKey();
-			if (!collapseKey.isEmpty()) {
-				messageBuilder.collapseKey(collapseKey.trim());
-			}
-			String restrictedPackageName = message.getRestrictedPackageName();
-			if (!restrictedPackageName.isEmpty()) {
-				messageBuilder.restrictedPackageName(restrictedPackageName
-						.trim());
-			}
-			Integer timeToLive = message.getTimeToLive();
-			if (timeToLive != null) {
-				messageBuilder.timeToLive(timeToLive);
-			}
-			Integer prority = message.getPriority();
-			if (prority != null) {
-				messageBuilder.priority(prority);
-			}
-			// Boolean
-			messageBuilder.delayWhileIdle(message.getDelayWhileIdle());
-			// Boolean
-			messageBuilder.dryRun(message.getDryRun());
-			// Boolean
-			messageBuilder.contentAvailable(message.getContentAvailable());
-
-			int total = targetList.size();
-			List<String> partialTargets = new ArrayList<String>(total);
-			int counter = 0;
-			int tasks = 0;
-			for (String target : targetList) {
-				counter++;
-				partialTargets.add(target);
-				int partialSize = partialTargets.size();
-				if (partialSize == MULTICAST_SIZE || counter == total) {
-					asyncSend(partialTargets, messageBuilder.build());
-					partialTargets.clear();
-					tasks++;
-				}
-			}
-			status = "Asynchronously sending " + tasks
-					+ " multicast messages to " + total + " devices";
-		}
-		logger.info(status);
-		// modelo.addAttribute("messagePlain", messagePlain);
-		// modelo.addAttribute("messageJson", messageJson);
-		// modelo.addAttribute("messageJsonMulti", messageJsonMulti);
-		// modelo.addAttribute("messageXMPP", messageXMPP);
-		// modelo.addAttribute("deviceList",
-		// deviceMngr.getdeviceListSnapshot());
-		// modelo.addAttribute("request", message.toString());
-		// modelo.addAttribute("response", status.toString());
-		// logger.info("Modelo: " + modelo.toString());
-		return new ModelAndView("Notifications", "modelo", createModel(modelo));
-	}
-
-	@RequestMapping(value = "/notificationXMPP", method = RequestMethod.POST)
-	protected void notificationXMPP(@RequestParam String regId,
-			HttpSession sesion, Model modelo) {
-		/*
-		 * TODO Send XMPP JSON notification
-		 */
-	}
-
-	/**
-	 * Send asynchronously the message to the partial list of devices
-	 * 
-	 * @param partialTargets
-	 * @param message
-	 */
-	private void asyncSend(List<String> partialTargets, final Message message) {
-		// make a copy
-		final List<String> devices = new ArrayList<String>(partialTargets);
-
-		threadPool.execute(new Runnable() {
-
-			public void run() {
-
-				MulticastResult multicastResult;
-				try {
-					multicastResult = sender.sendHttpJson(message, devices, 5);
-				} catch (IOException e) {
-					logger.error("Error posting messages", e);
-					return;
-				}
-				List<Result> results = multicastResult.getResults();
-				// analyze the results
-				for (int i = 0; i < devices.size(); i++) {
-					String regId = devices.get(i);
-					Result result = results.get(i);
-					String messageId = result.getMessageId();
-					if (messageId != null) {
-						logger.info("Succesfully sent message to device: "
-								+ regId + "; messageId = " + messageId);
-						String canonicalRegId = result
-								.getCanonicalRegistrationId();
-						if (canonicalRegId != null) {
-							// same device has more than on registration id:
-							// update it
-							logger.info("canonicalRegId " + canonicalRegId);
-							deviceMngr
-									.updateRegistration(regId, canonicalRegId);
-						}
-					} else {
-						String error = result.getErrorCodeName();
-						if (error.equals(Constants.ERROR_NOT_REGISTERED)) {
-							// application has been removed from device -
-							// unregister it
-							logger.info("Unregistered device: " + regId);
-							// Datastore.unregister(regId);
-						} else {
-							logger.error("Error sending message to " + regId
-									+ ": " + error);
-						}
-					}
-				}
-			}
-		});
 	}
 
 	private Model createModel(Model modelo) {

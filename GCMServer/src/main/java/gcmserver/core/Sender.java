@@ -904,18 +904,6 @@ public class Sender {
 		return (Number) value;
 	}
 
-	private ArrayList getArray(Map<?, ?> json, String field) {
-		Object value = json.get(field);
-		// if (value == null) {
-		// throw new CustomParserException("Missing field: " + field);
-		// }
-		if (!(value instanceof ArrayList)) {
-			throw new CustomParserException("Field " + field
-					+ " does not contain an array: " + value);
-		}
-		return (ArrayList) value;
-	}
-
 	class CustomParserException extends RuntimeException {
 		CustomParserException(String message) {
 			super(message);

@@ -49,7 +49,7 @@ public final class MessageViewModel {
 		notification.put("sound", "");
 		notification.put("tag", "");
 		notification.put("color", "");
-		notification.put("clickAction", "");
+		notification.put("click_action", "");
 	}
 
 	/**

@@ -29,7 +29,8 @@ public final class MessageViewModel {
 	private List<String> listTargets;
 	// optional parameters
 	private String collapseKey;
-	private Integer priority;
+	private boolean priorityHigh;
+	private String priority;
 	private Boolean contentAvailable;
 	private Boolean delayWhileIdle;
 	private Integer timeToLive;
@@ -39,6 +40,7 @@ public final class MessageViewModel {
 	private boolean enableNotification;
 	private String data;
 	private Map<String, String> notification;
+	private static final String PRIORITY_HIGH = "high";
 
 	public MessageViewModel() {
 		// this.data = new LinkedHashMap<String, String>();
@@ -83,18 +85,38 @@ public final class MessageViewModel {
 	}
 
 	/**
+	 * @param priority
+	 *            the priority to set
+	 */
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
+
+	/**
 	 * @return the priority
 	 */
-	public Integer getPriority() {
+	public String getPriority() {
 		return priority;
 	}
 
 	/**
-	 * @param priority
+	 * @param priorityHigh
 	 *            the priority to set
 	 */
-	public void setPriority(Integer priority) {
-		this.priority = priority;
+	public void setPriorityHigh(Boolean priorityHigh) {
+		this.priorityHigh = priorityHigh;
+		if (priorityHigh) {
+			setPriority(PRIORITY_HIGH);
+		}else{
+			setPriority("");
+		}
+	}
+
+	/**
+	 * @return the priorityHigh
+	 */
+	public Boolean getPriorityHigh() {
+		return priorityHigh;
 	}
 
 	/**
@@ -256,7 +278,7 @@ public final class MessageViewModel {
 		if (collapseKey != null && !collapseKey.isEmpty()) {
 			builder.append("collapseKey=").append(collapseKey).append(", ");
 		}
-		if (priority != null) {
+		if (priority != null && !priority.isEmpty()) {
 			builder.append("priority=").append(priority).append(", ");
 		}
 		if (contentAvailable != null) {

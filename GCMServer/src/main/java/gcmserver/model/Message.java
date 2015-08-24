@@ -71,7 +71,7 @@ import java.util.Map;
 public final class Message implements Serializable {
 
 	private String collapseKey;
-	private Integer priority;
+	private String priority;
 	private Boolean contentAvailable;
 	private Boolean delayWhileIdle;
 	private Integer timeToLive;
@@ -86,7 +86,7 @@ public final class Message implements Serializable {
 
 		// optional parameters
 		private String collapseKey;
-		private Integer priority;
+		private String priority;
 		private Boolean contentAvailable;
 		private Boolean delayWhileIdle;
 		private Integer timeToLive;
@@ -113,7 +113,7 @@ public final class Message implements Serializable {
 		/**
 		 * Sets the priority property.
 		 */
-		public Builder priority(int value) {
+		public Builder priority(String value) {
 			priority = value;
 			return this;
 		}
@@ -303,7 +303,7 @@ public final class Message implements Serializable {
 	/**
 	 * Get the priority
 	 */
-	public Integer getPriority() {
+	public String getPriority() {
 		return priority;
 	}
 

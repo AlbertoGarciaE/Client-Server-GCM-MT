@@ -229,8 +229,8 @@ public class NotificationController {
 				messageBuilder.timeToLive(timeToLive);
 			}
 
-			Integer prority = message.getPriority();
-			if (prority != null) {
+			String prority = message.getPriority();
+			if (!prority.isEmpty()) {
 				messageBuilder.priority(prority);
 			}
 
@@ -383,8 +383,8 @@ public class NotificationController {
 				messageBuilder.timeToLive(timeToLive);
 			}
 
-			Integer prority = message.getPriority();
-			if (prority != null) {
+			String prority = message.getPriority();
+			if (!prority.isEmpty()) {
 				messageBuilder.priority(prority);
 			}
 
@@ -529,8 +529,8 @@ public class NotificationController {
 				messageBuilder.timeToLive(timeToLive);
 			}
 
-			Integer prority = message.getPriority();
-			if (prority != null) {
+			String prority = message.getPriority();
+			if (!prority.isEmpty()) {
 				messageBuilder.priority(prority);
 			}
 

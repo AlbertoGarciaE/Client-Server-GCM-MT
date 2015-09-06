@@ -36,7 +36,6 @@
 			<li class="active"><a href="#" th:href="@{/Topics/}">Topics</a></li>
 			<li><a href="#" th:href="@{/deviceManagement/}">Devices</a></li>
 			<li class="divider-vertical"></li>
-			<li><a href="#">Settings</a></li>
 		</ul>
 	</div>
 	<div class="container">
@@ -57,7 +56,7 @@
 					<label for="input_topic_URL" class="control-label">Topic
 						URL</label> <input type="text" class="form-control" id="input_topic_URL"
 						placeholder="/topics/[a-zA-Z0-9-_.~%]+" required=""
-						th:field="*{url}"></input>
+						th:field="*{url}" pattern="/topics/[a-zA-Z0-9-_.~%]+"></input>
 				</div>
 				<input type="submit" class="btn btn-default" value="Send"></input> <input
 					type="reset" class="btn btn-default" value="Clear"></input>
